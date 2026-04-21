@@ -46,3 +46,11 @@ export const getProfile = async () => {
     }
 }
 
+// export const updateProfile = async (req, res) => {
+//     try {
+
+//     } catch (error) {
+//         console.log("Error updating user Profile", error);
+//         return res.status(500).json({message: "Server error"});
+//     }
+// }

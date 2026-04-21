@@ -18,9 +18,10 @@ export const verifyToken = (req, res, next) => {
 
 export const verifyRole = (role) => {
     return (req, res, next) => {
-        if (req.user.role !== role) {
+        const userRole = req.user?.role;
+        if (userRole !== role) {
             return res.status(403).json({message: "Access Denied"});
-        };
+        }
         next();
     }
 }
