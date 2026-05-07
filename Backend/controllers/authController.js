@@ -6,6 +6,7 @@ import strict from "node:assert/strict";
 export const register = async (req, res) => {
     const { username, email, password} = req.body;
     if (!username || !email || !password) return res.status(400).json({message: "All fields are required"});
+    
     try {
         
         const existingUser = await User.findOne({ email});
@@ -130,10 +131,10 @@ export const logOut = async (req, res) => {
         res.clearCookie("refreshToken", {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: strict,
+            sameSite: "strict",
         });
 
-        return res.status(200).json({message: "Logged out successfully!"})
+        return res.status(200).json({message: "Logged out successfully!"});
     } catch (error) {
         console.error("Error logging out", error)
         return res.status(500).json({message: "Server Error"})
