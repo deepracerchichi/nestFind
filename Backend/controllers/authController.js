@@ -72,15 +72,21 @@ export const login = async (req, res) => {
             sameSite: "strict"
         });
 
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 15 * 60 * 1000 // 15 minutes in milliseconds
+        });
+
         res.status(200).json({
-            accessToken,
             user: {
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                role: user.role
+                role: user.role,
             }
-        })
+        });
 
         
     } catch (e) {
@@ -107,15 +113,22 @@ export const refreshToken = async (req, res) => {
             }
         )
 
-        res.status(200).json({
-            newaccessToken,
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                role: user.role,
-            }
+        res.cookie("accessToken", newaccessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 15 * 60 * 1000
         });
+
+        res.status(200).json({
+        user: {
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+        }
+        });
+
     } catch (e) {
         if (e.name=== "TokenExpiredError" || e.name === "JsonWebTokenError") {
             return res.status(401).json({message: "Invalid or expired token"});
@@ -127,16 +140,22 @@ export const refreshToken = async (req, res) => {
 }
 
 export const logOut = async (req, res) => {
-    try {
-        res.clearCookie("refreshToken", {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-        });
+  try {
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
 
-        return res.status(200).json({message: "Logged out successfully!"});
-    } catch (error) {
-        console.error("Error logging out", error)
-        return res.status(500).json({message: "Server Error"})
-    }
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    return res.status(200).json({ message: "Logged out successfully!" });
+  } catch (error) {
+    console.error("Error logging out", error);
+    return res.status(500).json({ message: "Server Error" });
+  }
 }

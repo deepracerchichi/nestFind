@@ -1,20 +1,15 @@
 import jwt from "jsonwebtoken";
+
 export const verifyToken = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({message: "No Token Provided"});
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json({ message: "No Token Provided" });
 
-    const token = authHeader.split(" ")[1];
-
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if (err) {
-            return res.status(403).json({message: "Invalid Toke"})
-        }
-        req.user = user;
-        next();
-    } )
-
-
-} 
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ message: "Invalid Token" });
+    req.user = user;
+    next();
+  });
+}
 
 export const verifyRole = (role) => {
     return (req, res, next) => {

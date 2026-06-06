@@ -5,6 +5,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
+import listingRoutes from "./routes/listings.js"
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use(cookieParser()); //for the middleware
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/listings", listingRoutes)
 
 connectDB();
 
