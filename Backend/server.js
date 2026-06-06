@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
 import listingRoutes from "./routes/listings.js"
-
+import uploadRoutes from "./routes/upload.js"
 dotenv.config();
 
 const port = process.env.PORT
@@ -24,7 +24,7 @@ app.use(cookieParser()); //for the middleware
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/listings", listingRoutes)
-
+app.use("/api/upload", uploadRoutes)
 connectDB();
 
 app.listen(port, () => {

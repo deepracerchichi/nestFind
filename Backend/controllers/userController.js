@@ -44,6 +44,40 @@ export const getProfile = async (req, res) => {
   }
 }
 
+export const saveListing = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const {listingId} = req.params;
+        const alreadySaved = user.savedListings.includes(listingsId);
+
+        if (alreadySaved) {
+            //unsave it
+            user.savedListings = user.savedListings.filter(
+                (id) => id.toString() !== listingId
+            );
+            await user.save();
+            return res.status(200).json({message: "Listings unsaved"});
+        }
+        user.savedListings.push(listingId);
+        await user.save();
+        res.status(200).json({message: "Listings saved", saved: true})
+    } catch (e) {
+        console.error("Error saving listing", e);
+        res.status(500).json({message: "Server error"});
+    }
+};
+
+//GET /api/users/saved
+export const getSavedListings = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).populate("savedListings");
+        res.status(200).json({ listings: user.savedListings});
+    } catch (e) {
+        console.error("Error getting saved listings", e);
+        res.status(500).json({message: "Server error"});
+    }
+}
+
 // export const updateProfile = async (req, res) => {
 //     try {
 
