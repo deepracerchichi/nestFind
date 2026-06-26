@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL:process.env.BACKEND_URL,
+    baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
     withCredentials:true // lets the refreshToken cookie flow automatically
 })
 
@@ -33,7 +33,7 @@ const api = axios.create({
 
                 try {
                     await axios.get(
-                    `${process.env.BACKEND_URL}/api/auth/refreshToken`,
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/refreshToken`,
                     { withCredentials: true }
                     );
                     return api(original);

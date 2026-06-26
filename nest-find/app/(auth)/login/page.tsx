@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import api from "@/lib/api";
+import { loginUser } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,16 +17,16 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await api.post("/api/auth/login", {email, password});
-      const { user } = res.data; //cookie is set automatically by the browser
+      const { user } = await loginUser(email, password); //cookie is set automatically by the browser
 
       if (user.role === "admin") {
         router.push("/admin");
       } else {
         router.push("/dashboard");
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Something went wrong");
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message?: string } } };
+      setError(axiosErr.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -63,7 +63,7 @@ export default function LoginPage() {
       </div>
 
       <p className="text-sm mt-4 text-center">
-        Don't have an account?{" "}
+        Don&apos;t have an account?{" "}
         <Link href="/register" className="text-blue-600 hover:underline">
           Register
         </Link>

@@ -1,9 +1,10 @@
 
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Geist, Cal_Sans, Afacad } from "next/font/google";
 import "./globals.css";
 
-const geist = Geist({ subsets: ["latin"] });
+const calsans = Cal_Sans({weight:"400", subsets: ["latin"], variable: "--font-calsans"});
+const afacad = Afacad({subsets: ["latin"], variable: "--font-afacad"});
 
 export const metadata: Metadata = {
   title: "nestFind",
@@ -20,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={geist.className}>
+      <body className={`${calsans.variable} ${afacad.variable}`}>
         {children}
       </body>
     </html>
