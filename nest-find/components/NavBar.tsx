@@ -64,7 +64,7 @@ export const NavBar= () => {
 
                 <div className="hidden md:block md:space-x-4 lg:flex lg:items-center lg:gap-4">
                     <button
-                        className=""
+                        className="hover:text-primary transition-colors duration-300"
                         onClick={handleLogin}
                     >
                         Sign in

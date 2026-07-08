@@ -2,54 +2,66 @@
 import {toast} from "react-hot-toast"
 
 import {Listing} from "@/types/listing";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {fetchListings} from "@/lib/listings";
 import {Search} from "lucide-react";
 import ListingCard from "@/components/ListingCard";
+import {useRouter, useSearchParams} from "next/navigation";
 
 export default function ListingsPage() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const [listings, setListings] = useState<Listing[]>([]);
     const [loading, setLoading] = useState(true);
-    const [city, setCity] = useState("");
+    const [search, setSearch] = useState(searchParams.get("search") ?? "");
     const [propertyType, setPropertyType] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
 
-    const loadListings = async () => {
+    const loadListings = useCallback(async (signal?: AbortSignal) => {
+        const trimmedSearch = search.trim();
+        const trimmedMaxPrice = maxPrice.trim();
+        const parsedMaxPrice = Number(trimmedMaxPrice);
+
         setLoading(true);
         try {
             const data = await fetchListings({
-                city: city || undefined,
+                search: trimmedSearch || undefined,
                 propertyType: propertyType || undefined,
-                maxPrice: maxPrice ? parseInt(maxPrice) : undefined
-            });
+                maxPrice: trimmedMaxPrice && Number.isFinite(parsedMaxPrice) ? parsedMaxPrice : undefined
+            }, signal);
             setListings(data.listings);
         } catch (e) {
+            if (e && typeof e === "object" && "code" in e && e.code === "ERR_CANCELED") {
+                return;
+            }
+
             console.error("Error fetching all the listings", e);
             toast.error("Failed to load listings");
         } finally {
-            setLoading(false);
+            if (!signal?.aborted) {
+                setLoading(false);
+            }
         }
-    }
+    }, [search, propertyType, maxPrice])
 
     const clearFilters = () => {
-        setCity("");
+        setSearch("");
         setPropertyType("");
         setMaxPrice("");
-        fetchListings()
-            .then(data => setListings(data.listings))
-            .catch(() => toast.error("Failed to load listings"))
-            .finally(() => setLoading(false));
+        router.replace("/listings", {scroll: false});
     }
 
     useEffect(() => {
-        fetchListings()
-            .then(data => setListings(data.listings))
-            .catch(e => {
-                console.error("Error fetching all the listings", e);
-                toast.error("Failed to load listings");
-            })
-            .finally(() => setLoading(false));
-    }, [])
+        const controller = new AbortController();
+        const timeout = setTimeout(() => {
+            void loadListings(controller.signal);
+        }, 400);
+
+        return () => {
+            clearTimeout(timeout);
+            controller.abort();
+        };
+    }, [loadListings])
 
     return (
         <div className="min-h-screen">
@@ -75,9 +87,9 @@ export default function ListingsPage() {
                         <Search size={14} className="text-muted-foreground shrink-0" />
                         <input
                             type="text"
-                            placeholder="City (e.g. Lagos)"
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
+                            placeholder="Search title, city, state, address"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
                             className="bg-transparent outline-none text-sm w-full placeholder:text-muted-foreground"
                         />
                     </div>
@@ -107,10 +119,17 @@ export default function ListingsPage() {
                     </div>
 
                     <button
-                        onClick={loadListings}
+                        onClick={() => void loadListings()}
                         className="bg-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-other flex items-center gap-2 hover:opacity-90 transition-opacity"
                     >
                         <Search size={14} /> Search
+                    </button>
+
+                    <button
+                        onClick={clearFilters}
+                        className="text-primary font-other text-sm underline underline-offset-4 hover:opacity-80 transition-opacity"
+                    >
+                        Clear
                     </button>
                 </div>
             </div>

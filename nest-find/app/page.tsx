@@ -1,18 +1,38 @@
+"use client"
+
 import {NavBar} from "@/components/NavBar";
 import {Globe} from "@/components/ui/globe";
 import {Search} from "lucide-react";
 import FeaturedListings from "@/components/FeaturedListings";
 import AboutUs from "@/components/AboutUs";
 import Extra from "@/components/Extra";
+import {useRouter} from "next/navigation";
+import {useState} from "react";
+import Footer from "@/components/Footer";
 
 export default function Home() {
+    const router = useRouter();
+    const [search, setSearch] = useState("");
+
+    const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const trimmedSearch = search.trim();
+        if (!trimmedSearch) {
+            router.push("/listings");
+            return;
+        }
+
+        router.push(`/listings?search=${encodeURIComponent(trimmedSearch)}`);
+    }
+
   return (
       <div className="min-h-screen overflow-x-hidden">
           {/*<Toaster />*/}
           <NavBar />
           <main>
               
-              <header  className="relative min-h-screen flex items-start pt-28 overflow-hidden">
+              <header className="home-hero-pattern relative min-h-screen flex items-start pt-28 overflow-hidden">
 
                   <div className="container mx-auto px-6 pb-20 relative text-center">
                       <div className="relative z-10 items-center space-y-5">
@@ -26,14 +46,20 @@ export default function Home() {
                               Find verified apartments, houses, and studios across your vicinity all in one place.
                           </p>
 
-                          <div className="glass rounded-full px-7 py-3 max-w-xl mx-auto flex items-center gap-3 justify-end">
+                          <form
+                              onSubmit={handleSearch}
+                              className="glass rounded-full px-7 py-3 max-w-xl mx-auto flex items-center gap-3 justify-end"
+                          >
                               <input
                                   className="w-full outline-none "
                                   placeholder="Search city, neighborhood, address"
-                                  // onChange={}
+                                  value={search}
+                                  onChange={(e) => setSearch(e.target.value)}
                               />
-                              <Search size={20} className="text-foreground"/>
-                          </div>
+                              <button type="submit" aria-label="Search listings">
+                                  <Search size={20} className="text-foreground"/>
+                              </button>
+                          </form>
 
                       </div>
 
@@ -52,7 +78,7 @@ export default function Home() {
 
               <Extra />
 
-              
+              <Footer />
 
               
 

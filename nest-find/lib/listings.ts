@@ -1,6 +1,7 @@
 import api from "@/lib/api";
 
 export const fetchListings = async (params?:{
+    search?: string;
     title?: string;
     city?: string;
     propertyType?: string;
@@ -8,8 +9,8 @@ export const fetchListings = async (params?:{
     maxPrice?: number;
     bedrooms?: number;
     page?: number;
-})=> {
-    const res = await api.get("/api/listings", {params});
+}, signal?: AbortSignal)=> {
+    const res = await api.get("/api/listings", {params, signal});
     return res.data;
 }
 
