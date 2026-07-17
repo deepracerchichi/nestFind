@@ -18,7 +18,7 @@ const listingSchema = new mongoose.Schema(
         bedrooms: {type: Number, required: true},
         bathrooms: {type: Number, required: true},
         location: {
-            address: {type: Number, required: true},
+            address: {type: String, required: true},
             city: {type: String, required: true},
             state: {type: String, required: true},
             // For map pins [longitude, latitude]

@@ -4,8 +4,9 @@ import jwt from "jsonwebtoken"
 import strict from "node:assert/strict";
 
 export const register = async (req, res) => {
-    const { username, email, password} = req.body;
+    const { username, email, password, role } = req.body;
     if (!username || !email || !password) return res.status(400).json({message: "All fields are required"});
+    if (role && !["user", "admin"].includes(role)) return res.status(400).json({message: "Invalid role"});
     
     try {
         
@@ -18,6 +19,7 @@ export const register = async (req, res) => {
             username,
             email,
             password: hashedPswrd,
+            role: role || "user",
         });
         await user.save();
 

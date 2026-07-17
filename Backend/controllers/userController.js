@@ -48,7 +48,7 @@ export const saveListing = async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
         const {listingId} = req.params;
-        const alreadySaved = user.savedListings.includes(listingsId);
+        const alreadySaved = user.savedListings.includes(listingId);
 
         if (alreadySaved) {
             //unsave it
@@ -73,7 +73,7 @@ export const getSavedListings = async (req, res) => {
         const user = await User.findById(req.user.id).populate("savedListings");
         res.status(200).json({ listings: user.savedListings});
     } catch (e) {
-        console.error("Error getting saved listings", e);
+        console.error("Error getting saved savedlistings", e);
         res.status(500).json({message: "Server error"});
     }
 }

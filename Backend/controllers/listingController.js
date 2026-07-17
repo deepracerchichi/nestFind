@@ -8,6 +8,20 @@ export const getListings = async (req, res) => {
 
         //Build a filter object from query params
         const filter = { isAvailable: true };
+        const search = req.query.search || req.query.city || req.query.title;
+
+        if (search) {
+            const searchRegex = { $regex: search, $options: "i" };
+            filter.$or = [
+                { title: searchRegex },
+                { description: searchRegex },
+                { propertyType: searchRegex },
+                { "location.address": searchRegex },
+                { "location.city": searchRegex },
+                { "location.state": searchRegex },
+            ];
+        }
+
         if (req.query.city)
             filter["location.city"] = { $regex: req.query.city, $options: "i"};
         if (req.query.propertyType)
@@ -30,12 +44,12 @@ export const getListings = async (req, res) => {
 
 
     } catch (e) {
-        console.error("Error getting listings: ", e);
+        console.error("Error getting savedlistings: ", e);
         res.status(500).json({message: "Server error"});
     }
 }
 
-//GET /api/listings/:id get one listing by ID
+//GET /api/savedlistings/:id get one listing by ID
 export const getOneListing = async (req, res) => {
     try {
         const listing = await Listing.findById(req.params.id)
@@ -50,10 +64,10 @@ export const getOneListing = async (req, res) => {
 }
 
 
-//POST /api/listings - create a listing (admin only).
+//POST /api/savedlistings - create a listing (admin only).
 export const createListing = async (req, res) => {
     try {
-        const {title, description, price, priceType, bedrooms, bathrooms, location, amenities, images} = req.body;
+        const {title, description, price, priceType, propertyType, bedrooms, bathrooms, location, amenities, images} = req.body;
         const listing = new Listing({
             title, description, price, priceType, propertyType,
             bedrooms, bathrooms, location, amenities, images,
@@ -67,7 +81,7 @@ export const createListing = async (req, res) => {
     }
 }
 
-//PATCH /api/listings/:id - update a listing
+//PATCH /api/savedlistings/:id - update a listing
 
 export const updateListing = async (req, res) => {
     try {
@@ -85,7 +99,7 @@ export const updateListing = async (req, res) => {
     }
 }
 
-// DELETE /api/listings/:id
+// DELETE /api/savedlistings/:id
 export const deleteListing = async (req, res) => {
     try {
         const listing = await Listing.findById(req.params.id);
@@ -100,7 +114,7 @@ export const deleteListing = async (req, res) => {
     }
 }
 
-//GET /api/listings/mine
+//GET /api/savedlistings/mine
 export const getMyListings = async (req, res) => {
     try {
         const listings = await Listing.find({
@@ -108,7 +122,7 @@ export const getMyListings = async (req, res) => {
         }).sort({createdAt: -1});
         res.status(200).json({listings, total: listings.length})
     } catch (e) {
-        console.error("Error getting your listings", e);
+        console.error("Error getting your savedlistings", e);
         res.status(500).json({message: "Server error"});
     }
 }

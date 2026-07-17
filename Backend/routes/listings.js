@@ -10,7 +10,7 @@ import {verifyRole, verifyToken} from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-//  Public routes , no login needed to browse listings
+//  Public routes , no login needed to browse savedlistings
 router.get("/", getListings);
 router.get("/:id", getOneListing);
 
