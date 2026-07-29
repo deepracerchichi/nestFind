@@ -3,15 +3,58 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 import strict from "node:assert/strict";
 
+// Signs a fresh access/refresh token pair for `user` and sets them as
+// HttpOnly cookies on `res`, so any endpoint that authenticates a user
+// (login, register, ...) ends up in the same logged-in state.
+const issueAuthCookies = (user, res) => {
+    const accessToken = jwt.sign({
+        id: user._id,
+        role: user.role,
+    },
+            process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: "15m"
+        })
+
+
+    const refreshToken = jwt.sign({
+            id: user._id,
+            role: user.role,
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: "7d"
+        })
+
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days, matching the token's own expiry
+    });
+
+    res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 15 * 60 * 1000 // 15 minutes in milliseconds
+    });
+}
+
 export const register = async (req, res) => {
     const { username, email, password, role } = req.body;
     if (!username || !email || !password) return res.status(400).json({message: "All fields are required"});
     if (role && !["user", "admin"].includes(role)) return res.status(400).json({message: "Invalid role"});
-    
+
     try {
-        
-        const existingUser = await User.findOne({ email});
-        if (existingUser) return res.status(409).json({message: "User already exists"});
+
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+        if (existingUser) {
+            const message = existingUser.email === email
+                ? "User already exists"
+                : "Username already taken";
+            return res.status(409).json({ message });
+        }
 
         const hashedPswrd = await bcrypt.hash(password, 10);
 
@@ -22,6 +65,8 @@ export const register = async (req, res) => {
             role: role || "user",
         });
         await user.save();
+
+        issueAuthCookies(user, res);
 
         res.status(200).json({
             message: "User registered successfully",
@@ -41,7 +86,7 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     const {email, password} = req.body;
     if (!email || !password) return res.status(400).json({message: "All fields are required!"});
-    
+
     try {
         const user = await User.findOne({email});
         if (!user) return res.status(404).json({message: "User was not registered."})
@@ -49,37 +94,7 @@ export const login = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password)
         if (!isMatch) return res.status(400).json({message: "Invalid credentials"});
 
-        const accessToken = jwt.sign({
-            id: user._id,
-            role: user.role,
-        },
-                process.env.ACCESS_TOKEN_SECRET,
-            {
-                expiresIn: "15m"
-            })
-
-
-        const refreshToken = jwt.sign({
-                id: user._id,
-                role: user.role,
-            },
-            process.env.REFRESH_TOKEN_SECRET,
-            {
-                expiresIn: "7d"
-            })
-
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict"
-        });
-
-        res.cookie("accessToken", accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-            maxAge: 15 * 60 * 1000 // 15 minutes in milliseconds
-        });
+        issueAuthCookies(user, res);
 
         res.status(200).json({
             user: {
@@ -90,7 +105,7 @@ export const login = async (req, res) => {
             }
         });
 
-        
+
     } catch (e) {
             console.log("Error logging in", e);
             return res.status(500).json({message: "Server Error"});

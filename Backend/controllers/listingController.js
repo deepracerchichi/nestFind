@@ -118,7 +118,7 @@ export const deleteListing = async (req, res) => {
 export const getMyListings = async (req, res) => {
     try {
         const listings = await Listing.find({
-            postedById: req.user.id
+            postedBy: req.user.id
         }).sort({createdAt: -1});
         res.status(200).json({listings, total: listings.length})
     } catch (e) {

@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import User from "../models/user.js";
+import Listing from "../models/listing.js";
 
 export const getUsers = async(req, res) => {
     try {
@@ -46,8 +48,16 @@ export const getProfile = async (req, res) => {
 
 export const saveListing = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
         const {listingId} = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(listingId)) {
+            return res.status(400).json({message: "Invalid listing id"});
+        }
+
+        const listingExists = await Listing.exists({_id: listingId});
+        if (!listingExists) return res.status(404).json({message: "Listing not found"});
+
+        const user = await User.findById(req.user.id);
         const alreadySaved = user.savedListings.includes(listingId);
 
         if (alreadySaved) {
