@@ -1,20 +1,41 @@
 "use client"
-import {useState} from "react";
-import {MapPin, MenuIcon, XIcon} from "lucide-react";
+import {useEffect, useRef, useState} from "react";
+import {LayoutDashboard, LogOut, MapPin, MenuIcon, XIcon} from "lucide-react";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import {useAuth} from "@/context/AuthContext";
 
 export const NavBar= () => {
     // const headerRef = useRef<HTMLElement>(null);
     const [isMobile, setIsMobile] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const profileRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
+    const {user, logout} = useAuth();
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+                setIsProfileOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     const handleLogin = () => {
         router.push("/login");
     }
 
     const handleRegister = () => {
         router.push("/register")
+    }
+
+    const handleLogout = async () => {
+        setIsProfileOpen(false);
+        await logout();
+        router.push("/");
     }
 
     //
@@ -62,20 +83,59 @@ export const NavBar= () => {
                     </a> */}
                 </div>
 
-                <div className="hidden md:block md:space-x-4 lg:flex lg:items-center lg:gap-4">
-                    <button
-                        className="hover:text-primary transition-colors duration-300"
-                        onClick={handleLogin}
-                    >
-                        Sign in
-                    </button>
-                    <button className=" px-4 py-2 rounded-full bg-foreground
-                     text-background hover:text-primary hover:-translate-y-1
-                     transition-transform duration-300"
-                            onClick={handleRegister}
-                    >
-                        Get Started
-                    </button>
+                <div className="hidden md:flex md:items-center md:gap-4">
+                    {user ? (
+                        <div className="relative" ref={profileRef}>
+                            <button
+                                onClick={() => setIsProfileOpen((open) => !open)}
+                                className="h-9 w-9 rounded-full bg-primary text-primary-foreground font-semibold flex items-center justify-center hover:opacity-90 transition-opacity"
+                            >
+                                {user.username.charAt(0).toUpperCase()}
+                            </button>
+
+                            {isProfileOpen && (
+                                <div className="absolute right-0 mt-2 w-56 glass-strong rounded-xl p-2 z-50">
+                                    <div className="px-3 py-2 border-b border-border mb-1">
+                                        <p className="text-sm font-medium truncate">{user.username}</p>
+                                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                                    </div>
+
+                                    <Link
+                                        href={user.role === "admin" ? "/admin" : "/dashboard"}
+                                        onClick={() => setIsProfileOpen(false)}
+                                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-foreground hover:text-background transition-colors"
+                                    >
+                                        <LayoutDashboard size={16} />
+                                        Dashboard
+                                    </Link>
+
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left hover:bg-foreground hover:text-background transition-colors"
+                                    >
+                                        <LogOut size={16} />
+                                        Log out
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <>
+                            <button
+                                className="hover:text-primary transition-colors duration-300"
+                                onClick={handleLogin}
+                            >
+                                Sign in
+                            </button>
+                            <button className=" px-4 py-2 rounded-full bg-foreground
+                             text-background hover:text-primary hover:-translate-y-1
+                             transition-transform duration-300"
+                                    onClick={handleRegister}
+                            >
+                                Get Started
+                            </button>
+                        </>
+                    )}
                 </div>
 
                 {/* Mobile Menu*/}
@@ -101,20 +161,40 @@ export const NavBar= () => {
                             Browse Listings
                         </Link>
 
-                        <Link
-                            href="/login"
-                            onClick={()=> setIsMobile(false)}
-                            className="text-lg text-background hover:text-background py-2"
-                        >
-                            Sign In
-                        </Link>
-                        <Link
-                            href="/register"
-                            onClick={()=> setIsMobile(false)}
-                            className="text-lg text-background hover:text-background py-2"
-                        >
-                            Register
-                        </Link>
+                        {user ? (
+                            <>
+                                <Link
+                                    href={user.role === "admin" ? "/admin" : "/dashboard"}
+                                    onClick={()=> setIsMobile(false)}
+                                    className="text-lg text-background hover:text-background py-2"
+                                >
+                                    Dashboard
+                                </Link>
+                                <button
+                                    onClick={() => { setIsMobile(false); void handleLogout(); }}
+                                    className="text-lg text-left text-background hover:text-background py-2"
+                                >
+                                    Log out
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <Link
+                                    href="/login"
+                                    onClick={()=> setIsMobile(false)}
+                                    className="text-lg text-background hover:text-background py-2"
+                                >
+                                    Sign In
+                                </Link>
+                                <Link
+                                    href="/register"
+                                    onClick={()=> setIsMobile(false)}
+                                    className="text-lg text-background hover:text-background py-2"
+                                >
+                                    Register
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
             )}

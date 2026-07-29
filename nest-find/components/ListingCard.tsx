@@ -2,12 +2,20 @@ import {Listing} from "@/types/listing";
 import Link from "next/link";
 import Image from "next/image";
 import {MapPin, BedDouble, Bath} from "lucide-react"
+import {usePathname, useSearchParams} from "next/navigation";
 
 
 export default function ListingCard({listing}: {listing: Listing}) {
     const firstImage = listing.images[0] || "/placeholder.jpg";
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    const query = searchParams.toString();
+    const from = `${pathname}${query ? `?${query}` : ""}`;
+    const detailHref = `listings/${listing._id}?from=${encodeURIComponent(from)}`;
+
     return (
-        <Link href={`listings/${listing._id}`}>
+        <Link href={detailHref}>
             <div className='group glass rounded-2xl overflow-hidden animate-fade-in md:row-span-1'>
 
                 <div className='relative overflow-hidden aspect-video'>

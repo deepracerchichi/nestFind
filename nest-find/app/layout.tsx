@@ -1,6 +1,8 @@
 
 import type { Metadata } from "next";
 import { Geist, Cal_Sans, Afacad } from "next/font/google";
+import { AuthProvider } from "@/context/AuthContext";
+import { getServerUser } from "@/lib/auth.server";
 import "./globals.css";
 
 const calsans = Cal_Sans({weight:"400", subsets: ["latin"], variable: "--font-calsans"});
@@ -14,15 +16,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const initialUser = await getServerUser();
+
   return (
     <html lang="en">
       <body className={`${calsans.variable} ${afacad.variable}`}>
-        {children}
+        <AuthProvider initialUser={initialUser}>{children}</AuthProvider>
       </body>
     </html>
   );

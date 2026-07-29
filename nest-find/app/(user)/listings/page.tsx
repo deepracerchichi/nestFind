@@ -22,6 +22,13 @@ export default function ListingsPage() {
         const trimmedMaxPrice = maxPrice.trim();
         const parsedMaxPrice = Number(trimmedMaxPrice);
 
+        const params = new URLSearchParams();
+        if (trimmedSearch) params.set("search", trimmedSearch);
+        if (propertyType) params.set("propertyType", propertyType);
+        if (trimmedMaxPrice) params.set("maxPrice", trimmedMaxPrice);
+        const query = params.toString();
+        router.replace(query ? `/listings?${query}` : "/listings", { scroll: false });
+
         setLoading(true);
         try {
             const data = await fetchListings({
@@ -42,7 +49,7 @@ export default function ListingsPage() {
                 setLoading(false);
             }
         }
-    }, [search, propertyType, maxPrice])
+    }, [search, propertyType, maxPrice, router])
 
     const clearFilters = () => {
         setSearch("");
@@ -80,7 +87,7 @@ export default function ListingsPage() {
             </section>
 
             {/* Sticky Filter Bar */}
-            <div className="sticky top-16 z-30 bg-background/80 backdrop-blur-md border-b border-border px-6 md:px-14 py-4">
+            <div className=" top-16 z-30 bg-background/80 backdrop-blur-md border-b border-border px-6 md:px-14 py-4">
                 <div className="flex flex-wrap gap-3 items-center max-w-5xl">
 
                     <div className="glass flex items-center gap-2 rounded-full px-4 py-2 flex-1 min-w-40">
@@ -135,7 +142,7 @@ export default function ListingsPage() {
             </div>
 
             {/* Results */}
-            <section className="px-6 md:px-14 py-10 bg-background">
+            <section className="px-6 md:px-14 py-10 bg-foreground">
                 {loading ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
                         {[...Array(6)].map((_, i) => (

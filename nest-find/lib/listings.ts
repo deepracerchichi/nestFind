@@ -1,4 +1,10 @@
 import api from "@/lib/api";
+import type { Listing } from "@/types/listing";
+
+export const fetchSavedListings = async (signal?: AbortSignal): Promise<Listing[]> => {
+    const res = await api.get<{ listings: Listing[] }>("/api/users/saved", { signal });
+    return res.data.listings;
+}
 
 export const fetchListings = async (params?:{
     search?: string;
@@ -21,5 +27,20 @@ export const fetchListing = async (id: string) => {
 
 export const toggleSaveListing = async (listingId: string) => {
     const res = await api.post(`/api/users/save/${listingId}`);
+    return res.data;
+}
+
+export const fetchMyListings = async (signal?: AbortSignal): Promise<Listing[]> => {
+    const res = await api.get<{ listings: Listing[]; total: number }>("/api/listings/me", { signal });
+    return res.data.listings;
+}
+
+export const updateListing = async (id: string, data: Partial<Pick<Listing, "isAvailable">>) => {
+    const res = await api.patch(`/api/listings/${id}`, data);
+    return res.data;
+}
+
+export const deleteListing = async (id: string) => {
+    const res = await api.delete(`/api/listings/${id}`);
     return res.data;
 }

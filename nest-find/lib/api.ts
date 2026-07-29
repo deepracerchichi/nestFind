@@ -1,5 +1,14 @@
 import axios from "axios";
 
+declare module "axios" {
+    export interface AxiosRequestConfig {
+        // Set on requests that are allowed to fail silently when the user
+        // simply isn't logged in (e.g. "am I logged in?" checks on public
+        // pages) instead of being bounced to /login.
+        skipAuthRedirect?: boolean;
+    }
+}
+
 const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
     withCredentials:true // lets the refreshToken cookie flow automatically
@@ -38,7 +47,9 @@ const api = axios.create({
                     );
                     return api(original);
                 } catch {
-                    window.location.href = "/login";
+                    if (!original.skipAuthRedirect) {
+                        window.location.href = "/login";
+                    }
                 }
             }
 

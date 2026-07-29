@@ -3,15 +3,15 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
-import { Heart, TrendingUp } from "lucide-react";
+import { Home, CircleDot, TrendingUp } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { fetchSavedListings } from "@/lib/listings";
+import { fetchMyListings } from "@/lib/listings";
 import type { Listing } from "@/types/listing";
 import ListingCard from "@/components/ListingCard";
 
-export default function DashboardOverviewPage() {
+export default function AdminOverviewPage() {
     const { user } = useAuth();
-    const [savedListings, setSavedListings] = useState<Listing[]>([]);
+    const [myListings, setMyListings] = useState<Listing[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -19,12 +19,12 @@ export default function DashboardOverviewPage() {
 
         (async () => {
             try {
-                const listings = await fetchSavedListings(controller.signal);
-                setSavedListings(listings);
+                const listings = await fetchMyListings(controller.signal);
+                setMyListings(listings);
             } catch (e) {
                 if (e && typeof e === "object" && "code" in e && e.code === "ERR_CANCELED") return;
-                console.error("Error fetching saved listings", e);
-                toast.error("Failed to load your saved listings");
+                console.error("Error fetching your listings", e);
+                toast.error("Failed to load your listings");
             } finally {
                 if (!controller.signal.aborted) setLoading(false);
             }
@@ -33,8 +33,9 @@ export default function DashboardOverviewPage() {
         return () => controller.abort();
     }, []);
 
-    const avgPrice = savedListings.length
-        ? Math.round(savedListings.reduce((sum, l) => sum + l.price, 0) / savedListings.length)
+    const availableCount = myListings.filter((l) => l.isAvailable).length;
+    const avgPrice = myListings.length
+        ? Math.round(myListings.reduce((sum, l) => sum + l.price, 0) / myListings.length)
         : null;
 
     return (
@@ -51,26 +52,34 @@ export default function DashboardOverviewPage() {
                     </div>
                 </div>
                 <Link
-                    href="/listings"
+                    href="/admin/create-listing"
                     className="bg-foreground text-background px-6 py-3 rounded-full text-sm font-medium hover:-translate-y-1 transition-transform"
                 >
-                    Browse listings
+                    + Create a new listing
                 </Link>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
                 <div className="glass rounded-2xl p-5">
                     <p className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2 mb-2">
-                        <Heart size={14} /> Saved listings
+                        <Home size={14} /> Total listings
                     </p>
                     <p className="text-3xl font-other font-semibold">
-                        {loading ? "—" : savedListings.length}
+                        {loading ? "—" : myListings.length}
                     </p>
                 </div>
                 <div className="glass rounded-2xl p-5">
                     <p className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2 mb-2">
-                        <TrendingUp size={14} /> Avg. saved price
+                        <CircleDot size={14} /> Available now
+                    </p>
+                    <p className="text-3xl font-other font-semibold">
+                        {loading ? "—" : availableCount}
+                    </p>
+                </div>
+                <div className="glass rounded-2xl p-5">
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2 mb-2">
+                        <TrendingUp size={14} /> Avg. asking price
                     </p>
                     <p className="text-3xl font-other font-semibold">
                         {loading ? "—" : avgPrice !== null ? `₦${avgPrice.toLocaleString()}` : "—"}
@@ -78,11 +87,11 @@ export default function DashboardOverviewPage() {
                 </div>
             </div>
 
-            {/* Recently saved */}
+            {/* Recently added */}
             <div className="flex items-baseline justify-between mb-4">
-                <h2 className="text-lg font-semibold">Recently saved</h2>
-                {savedListings.length > 0 && (
-                    <Link href="/dashboard/savedlistings" className="text-primary text-sm font-medium hover:opacity-80">
+                <h2 className="text-lg font-semibold">Recently added</h2>
+                {myListings.length > 0 && (
+                    <Link href="/admin/listings" className="text-primary text-sm font-medium hover:opacity-80">
                         View all →
                     </Link>
                 )}
@@ -100,18 +109,18 @@ export default function DashboardOverviewPage() {
                         </div>
                     ))}
                 </div>
-            ) : savedListings.length === 0 ? (
+            ) : myListings.length === 0 ? (
                 <div className="text-center py-16 space-y-3 glass rounded-2xl">
-                    <p className="text-4xl">♡</p>
-                    <h3 className="font-semibold">No saved listings yet</h3>
-                    <p className="text-muted-foreground text-sm">Tap the heart on any listing to save it here.</p>
-                    <Link href="/listings" className="inline-block text-primary text-sm font-medium underline underline-offset-4">
-                        Browse listings
+                    <p className="text-4xl">⌂</p>
+                    <h3 className="font-semibold">No listings yet</h3>
+                    <p className="text-muted-foreground text-sm">Create your first listing to get it in front of buyers.</p>
+                    <Link href="/admin/create-listing" className="inline-block text-primary text-sm font-medium underline underline-offset-4">
+                        Create a listing
                     </Link>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
-                    {savedListings.slice(0, 3).map((listing) => (
+                    {myListings.slice(0, 3).map((listing) => (
                         <ListingCard listing={listing} key={listing._id} />
                     ))}
                 </div>
