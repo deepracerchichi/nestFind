@@ -97,7 +97,7 @@ export default function LoginPage() {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                autoComplete="new-password"
+                autoComplete="current-password"
                 className=" font-medium font-other border-b-2 p-2 pr-10 pl-10 w-full focus:outline-none focus:border-primary"
               />
               <button 
@@ -111,6 +111,13 @@ export default function LoginPage() {
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
+            
+            <div className="w-full text-right -mt-2 mb-1">
+              <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-primary">
+                  Forgot password?
+              </Link>
+          </div>
+
 
             <button
               onClick={handleLogin}

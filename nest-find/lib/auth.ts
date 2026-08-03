@@ -30,3 +30,18 @@ export const logoutUser = async () => {
     const res = await api.post("/api/auth/logout");
     return res.data;
 };
+
+export const verifyEmail = async (token: string) => {
+    const res = await api.post("/api/auth/verify-email", { token});
+    return res.data;
+}
+
+export const forgotPassword = async (email: string) => {
+    const res = await api.post("/api/auth/forgot-password", { email });
+    return res.data;
+};
+
+export const resetPassword = async (token: string, newPassword: string) => {
+    const res = await api.post("/api/auth/reset-password", { token, newPassword });
+    return res.data;
+};

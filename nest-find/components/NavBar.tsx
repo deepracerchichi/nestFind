@@ -13,6 +13,7 @@ export const NavBar= () => {
     const profileRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const {user, logout} = useAuth();
+    const [isScrolled, setIsScrolled] = useState(false);
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -22,6 +23,16 @@ export const NavBar= () => {
         };
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+    
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 10)
+        };
+
+        window.addEventListener("scroll", handleScroll, {passive: true});
+        return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
     const handleLogin = () => {
@@ -38,35 +49,9 @@ export const NavBar= () => {
         router.push("/");
     }
 
-    //
-    // useGSAP(
-    //     () => {
-    //         const navTween = gsap.timeline({
-    //             scrollTrigger: {
-    //                 trigger: headerRef.current,
-    //                 start: "bottom top"
-    //             }
-    //         })
-    //
-    //         navTween.fromTo(headerRef.current,
-    //             {
-    //                 backgroundColor: 'transparent',
-    //                 paddingTop: '20px',
-    //                 paddingBottom: '20px',
-    //             },
-    //             {
-    //                 paddingTop: '12px',
-    //                 paddingBottom: '12px',
-    //                 backgroundColor: 'rgba(62, 34, 73, 0.9)',
-    //                 backdropFilter: 'blur(16px)',
-    //
-    //                 duration: 1,
-    //                 ease: 'power1.inOut'
-    //             })
-    //     }, { scope: headerRef }
-    // )
+   
     return (
-        <header className="fixed top-0 left-0 transition-all right-0 z-50">
+        <header className={`fixed top-0 left-0 transition-colors right-0 z-50 duration-300 ${isScrolled ? "glass" : "bg-transparent"}`}>
             <nav className="mx-auto max-w-7xl flex items-center justify-between px-6 h-16">
                 <Link href="/" className="flex shrink-0">
                     <Image src="/navLogo.png" alt="logo" width={80} height={32} className="h-8 w-auto"/>
