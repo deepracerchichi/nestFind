@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 import strict from "node:assert/strict";
+import { sendVerificationEmail, sendWelcomeEmail } from "../utils/email.js";
 
 // Signs a fresh access/refresh token pair for `user` and sets them as
 // HttpOnly cookies on `res`, so any endpoint that authenticates a user
@@ -67,6 +68,16 @@ export const register = async (req, res) => {
         await user.save();
 
         issueAuthCookies(user, res);
+
+        const verificationToken = jwt.sign(
+            {id: user._id},
+            process.env.EMAIL_VERIFICATION_SECRET,
+            {expiresIn: "1d"}
+        );
+
+        sendVerificationEmail(user.email, verificationToken).catch((err) => 
+            console.error("Failed to send verification email", err)
+        );
 
         res.status(200).json({
             message: "User registered successfully",
@@ -176,3 +187,36 @@ export const logOut = async (req, res) => {
     return res.status(500).json({ message: "Server Error" });
   }
 }
+
+export const verifyEmail = async (req, res) => {
+    const {token} = req.body;
+    if (!token) return res.status(400).json({message: "Token is required"});
+
+    try {
+        const decoded = jwt.verify(token, process.env.EMAIL_VERIFICATION_SECRET);
+        const user = await User.findById(decoded.id);
+        if (!user) return res.status(404).json({message: "User not found"});
+
+        if (user.isVerified) {
+            return res.status(200).json({message: "Email already verified"});
+        }
+
+        user.isVerified = true;
+        await user.save();
+
+        sendWelcomeEmail(user.email, user.username).catch((err) => 
+            console.error("Failed to send welcome email", err)
+        );
+
+        res.status(200).json({message: "Email verified successfully"});
+    } catch (e) {
+        if (e.name === "TokenExpiredError" || e.name === "JsonWebTokenError") {
+            return res.status(400).json({message: "Invalid or expired link"});
+
+
+        }
+
+        console.error("Error verifying email", e);
+        res.status(500).json({message: "Server Error"});
+    }
+};
