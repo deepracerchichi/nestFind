@@ -1,11 +1,28 @@
-import {Resend} from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Constructed lazily, on first send, instead of at module load - same
+// reasoning as the old Resend client: don't depend on import order for
+// env vars (see the dotenv/import-hoisting bug we hit earlier).
+let transporter;
+const getTransporter = () => {
+    if (!transporter) {
+        transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.GMAIL_USER,
+                pass: process.env.GMAIL_APP_PASSWORD,
+            },
+        });
+    }
+    return transporter;
+};
+
+const FROM = () => `"nestFind" <${process.env.GMAIL_USER}>`;
 
 export const sendVerificationEmail = async (to, token) => {
     const link = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
-    await resend.emails.send({
-        from: process.env.EMAIL_FROM,
+    await getTransporter().sendMail({
+        from: FROM(),
         to,
         subject: "Confirm your email address",
         html: `<p>Welcome to nestFind - click below to confirm your email: </p>
@@ -16,8 +33,8 @@ export const sendVerificationEmail = async (to, token) => {
 
 export const sendPasswordResetEmail = async (to, token) => {
     const link = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
-    await resend.emails.send({
-        from: process.env.EMAIL_FROM,
+    await getTransporter().sendMail({
+        from: FROM(),
         to,
         subject: "Reset your password",
         html: `<p>Click below to reset your password:</p>
@@ -27,8 +44,8 @@ export const sendPasswordResetEmail = async (to, token) => {
 }
 
 export const sendWelcomeEmail = async (to, username) => {
-    await resend.emails.send({
-        from: process.env.EMAIL_FROM,
+    await getTransporter().sendMail({
+        from: FROM(),
         to,
         subject: "You're verified!",
         html: `<p>Hey ${username}, your email's been confirmed! You're all set on nestFind. Welcome aboard!</p>`

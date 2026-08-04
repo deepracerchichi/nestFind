@@ -2,7 +2,7 @@ import User from "../models/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 import strict from "node:assert/strict";
-import { sendVerificationEmail, sendWelcomeEmail } from "../utils/email.js";
+import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail } from "../utils/email.js";
 
 // Signs a fresh access/refresh token pair for `user` and sets them as
 // HttpOnly cookies on `res`, so any endpoint that authenticates a user
@@ -218,5 +218,63 @@ export const verifyEmail = async (req, res) => {
 
         console.error("Error verifying email", e);
         res.status(500).json({message: "Server Error"});
+    }
+};
+
+export const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (user) {
+            const resetToken = jwt.sign(
+                { id: user._id, pwd: user.password.slice(-10) },
+                process.env.PASSWORD_RESET_SECRET,
+                { expiresIn: "15m" }
+            );
+
+            sendPasswordResetEmail(user.email, resetToken).catch((err) =>
+                console.error("Failed to send password reset email", err)
+            );
+        }
+
+        // Same response whether or not the account exists - otherwise this
+        // endpoint becomes a way to check which emails are registered users.
+        res.status(200).json({
+            message: "If that email is registered, a reset link has been sent.",
+        });
+    } catch (error) {
+        console.error("Error requesting password reset", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+export const resetPassword = async (req, res) => {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword) {
+        return res.status(400).json({ message: "Token and new password are required" });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.PASSWORD_RESET_SECRET);
+        const user = await User.findById(decoded.id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        if (decoded.pwd !== user.password.slice(-10)) {
+            return res.status(400).json({ message: "This reset link has already been used or is no longer valid." });
+        }
+
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+
+        res.status(200).json({ message: "Password reset successfully" });
+    } catch (e) {
+        if (e.name === "TokenExpiredError" || e.name === "JsonWebTokenError") {
+            return res.status(400).json({ message: "Invalid or expired reset link" });
+        }
+        console.error("Error resetting password", e);
+        res.status(500).json({ message: "Server Error" });
     }
 };
