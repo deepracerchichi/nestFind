@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 import { getCurrentUser, logoutUser } from "@/lib/auth";
 import type { User } from "@/types/auth";
 
@@ -23,15 +23,15 @@ export function AuthProvider({
     // so there's no loading state to track and no logged-out flash on first paint.
     const [user, setUser] = useState<User | null>(initialUser);
 
-    const refresh = async () => {
+    const refresh = useCallback(async () => {
         const current = await getCurrentUser();
         setUser(current);
-    };
+    }, []);
 
-    const logout = async () => {
+    const logout = useCallback(async () => {
         await logoutUser();
         setUser(null);
-    };
+    }, []);
 
     return (
         <AuthContext.Provider value={{ user, refresh, logout }}>

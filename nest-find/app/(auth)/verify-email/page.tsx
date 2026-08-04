@@ -4,10 +4,12 @@ import {useSearchParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import Link from "next/link";
 import {verifyEmail} from "@/lib/auth";
+import {useAuth} from "@/context/AuthContext";
 
 export default function VerifyEmailPage() {
     const searchParams = useSearchParams();
     const token = searchParams.get("token");
+    const {refresh} = useAuth();
     const [status, setStatus] = useState<"loading" | "success" | "error">(
         token ? "loading" : "error"
     );
@@ -17,7 +19,8 @@ export default function VerifyEmailPage() {
         if (!token) return;
 
         verifyEmail(token)
-            .then((data) => {
+            .then(async (data) => {
+                await refresh(); // resync AuthContext - this tab's session may have been seeded before verification happened
                 setStatus("success");
                 setMessage(data.message);
             })
@@ -26,7 +29,7 @@ export default function VerifyEmailPage() {
                 setMessage(err.response?.data?.message || "Verification failed.");
             });
 
-    }, [token]);
+    }, [token, refresh]);
 
     return (
         <div className="flex min-h-screen items-center justify-center p-8">
