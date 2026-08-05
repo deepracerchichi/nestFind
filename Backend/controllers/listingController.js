@@ -26,6 +26,10 @@ export const getListings = async (req, res) => {
             filter["location.city"] = { $regex: req.query.city, $options: "i"};
         if (req.query.propertyType)
             filter.propertyType = req.query.propertyType;
+        // Prices only compare meaningfully within a single currency, so a
+        // price filter is always scoped to whichever currency the client sends.
+        if (req.query.currency)
+            filter.currency = req.query.currency;
         if (req.query.minPrice || req.query.maxPrice) {
             filter.price = {};
             if (req.query.minPrice) filter.price.$gte = parseInt(req.query.minPrice);
@@ -67,9 +71,9 @@ export const getOneListing = async (req, res) => {
 //POST /api/savedlistings - create a listing (admin only).
 export const createListing = async (req, res) => {
     try {
-        const {title, description, price, priceType, propertyType, bedrooms, bathrooms, location, amenities, images} = req.body;
+        const {title, description, price, currency, priceType, propertyType, bedrooms, bathrooms, location, amenities, images} = req.body;
         const listing = new Listing({
-            title, description, price, priceType, propertyType,
+            title, description, price, currency, priceType, propertyType,
             bedrooms, bathrooms, location, amenities, images,
             postedBy: req.user.id, //comes from verifyToken middleware
         });
@@ -90,7 +94,20 @@ export const updateListing = async (req, res) => {
         // Only the person who posted it can update it
         if (listing.postedBy.toString() !== req.user.id)
             return res.status(403).json({message: "Not authorized"});
-        const updated = await Listing.findByIdAndUpdate(req.params.id, req.body, {new: true}); //return the new updated doc not the old one
+
+        // Whitelist editable fields instead of trusting the whole body -
+        // otherwise a raw API call could set postedBy or any other field.
+        const {
+            title, description, price, currency, priceType, propertyType,
+            bedrooms, bathrooms, location, amenities, images, isAvailable,
+        } = req.body;
+        const updates = {
+            title, description, price, currency, priceType, propertyType,
+            bedrooms, bathrooms, location, amenities, images, isAvailable,
+        };
+        Object.keys(updates).forEach((key) => updates[key] === undefined && delete updates[key]);
+
+        const updated = await Listing.findByIdAndUpdate(req.params.id, updates, {new: true}); //return the new updated doc not the old one
         res.status(200).json({message: "Listing updated ", listing: updated})
     } catch (e) {
         console.error("Error updating listing", e);

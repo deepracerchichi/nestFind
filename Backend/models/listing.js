@@ -5,6 +5,11 @@ const listingSchema = new mongoose.Schema(
         title: {type: String, required: true, trim: true},
         description: {type: String, required: true},
         price: {type: Number, required: true},
+        currency: {
+            type: String,
+            enum: ["NGN", "USD", "GBP", "EUR", "GHS", "KES", "ZAR"],
+            default: "NGN",
+        },
         priceType: {
             type: String,
             enum: ["per month", "per year", "per night"],
