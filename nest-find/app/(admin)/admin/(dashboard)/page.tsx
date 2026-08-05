@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Home, CircleDot, TrendingUp, PlusCircleIcon, PlusIcon, HouseIcon } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { fetchMyListings } from "@/lib/listings";
+import { formatPrice } from "@/lib/currency";
 import type { Listing } from "@/types/listing";
 import ListingCard from "@/components/ListingCard";
 
@@ -34,9 +35,14 @@ export default function AdminOverviewPage() {
     }, []);
 
     const availableCount = myListings.filter((l) => l.isAvailable).length;
+    const listingCurrencies = new Set(myListings.map((l) => l.currency));
     const avgPrice = myListings.length
         ? Math.round(myListings.reduce((sum, l) => sum + l.price, 0) / myListings.length)
         : null;
+    // Averaging across currencies would be a meaningless number - only show
+    // one when every listing actually shares the same currency.
+    const avgPriceDisplay =
+        avgPrice === null ? "—" : listingCurrencies.size > 1 ? "Mixed" : formatPrice(avgPrice, myListings[0].currency);
 
     return (
         <div>
@@ -86,7 +92,7 @@ export default function AdminOverviewPage() {
                         <TrendingUp size={14} /> Avg. asking price
                     </p>
                     <p className="text-3xl font-other font-semibold">
-                        {loading ? "—" : avgPrice !== null ? `₦${avgPrice.toLocaleString()}` : "—"}
+                        {loading ? "—" : avgPriceDisplay}
                     </p>
                 </div>
             </div>

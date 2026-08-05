@@ -11,6 +11,7 @@ export const fetchListings = async (params?:{
     title?: string;
     city?: string;
     propertyType?: string;
+    currency?: string;
     minPrice?: number;
     maxPrice?: number;
     bedrooms?: number;

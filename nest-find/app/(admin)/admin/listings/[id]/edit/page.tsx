@@ -59,8 +59,11 @@ export default function EditListingPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen pt-24 px-6 flex items-center justify-center text-muted-foreground text-sm">
-                Loading listing...
+            <div className="min-h-screen flex flex-col">
+                <div className="h-24 bg-background" />
+                <div className="bg-foreground flex-1 px-6 flex items-center justify-center text-muted-foreground text-sm">
+                    Loading listing...
+                </div>
             </div>
         );
     }
@@ -68,42 +71,46 @@ export default function EditListingPage() {
     if (!listing) return null;
 
     return (
-        <div className="min-h-screen pt-24 px-6 md:px-14 pb-24">
-            <div className="max-w-3xl mx-auto">
-                <Link
-                    href="/admin/listings"
-                    className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-5"
-                >
-                    <ArrowLeft size={15} /> Back to My Listings
-                </Link>
+        <div className="min-h-screen flex flex-col">
+            <div className="h-24 bg-background" />
+            <div className="bg-foreground flex-1 px-6 md:px-14 pt-8 pb-24">
+                <div className="max-w-3xl mx-auto">
+                    <Link
+                        href="/admin/listings"
+                        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-background mb-5"
+                    >
+                        <ArrowLeft size={15} /> Back to My Listings
+                    </Link>
 
-                <div className="mb-7">
-                    <h1 className="text-2xl font-bold">Edit listing</h1>
-                    <p className="text-muted-foreground text-sm mt-1">
-                        Changes go live on Browse Listings immediately.
-                    </p>
+                    <div className="mb-7">
+                        <h1 className="text-2xl font-bold text-background">Edit listing</h1>
+                        <p className="text-muted-foreground text-sm mt-1">
+                            Changes go live on Browse Listings immediately.
+                        </p>
+                    </div>
+
+                    <ListingForm
+                        initialValues={{
+                            title: listing.title,
+                            description: listing.description,
+                            price: String(listing.price),
+                            currency: listing.currency,
+                            priceType: listing.priceType,
+                            propertyType: listing.propertyType,
+                            bedrooms: listing.bedrooms,
+                            bathrooms: listing.bathrooms,
+                            address: listing.location.address,
+                            city: listing.location.city,
+                            state: listing.location.state,
+                        }}
+                        initialAmenities={listing.amenities}
+                        initialImages={listing.images}
+                        submitLabel="Save changes"
+                        loadingLabel="Saving..."
+                        onCancel={() => router.push("/admin/listings")}
+                        onSubmit={handleSubmit}
+                    />
                 </div>
-
-                <ListingForm
-                    initialValues={{
-                        title: listing.title,
-                        description: listing.description,
-                        price: String(listing.price),
-                        priceType: listing.priceType,
-                        propertyType: listing.propertyType,
-                        bedrooms: listing.bedrooms,
-                        bathrooms: listing.bathrooms,
-                        address: listing.location.address,
-                        city: listing.location.city,
-                        state: listing.location.state,
-                    }}
-                    initialAmenities={listing.amenities}
-                    initialImages={listing.images}
-                    submitLabel="Save changes"
-                    loadingLabel="Saving..."
-                    onCancel={() => router.push("/admin/listings")}
-                    onSubmit={handleSubmit}
-                />
             </div>
         </div>
     );

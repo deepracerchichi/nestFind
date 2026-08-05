@@ -122,7 +122,7 @@ export default function MyListingsPage() {
                             <div className="flex gap-2 mt-3">
                                 <Link
                                     href={`/admin/listings/${listing._id}/edit`}
-                                    className="flex-1 flex items-center justify-center gap-1.5 bg-background text-foreground rounded-full py-2 text-xs font-medium hover:bg-white/10 transition-colors"
+                                    className="flex-1 flex items-center justify-center gap-1.5 bg-background text-foreground rounded-full py-2 text-xs font-medium  transition-colors"
                                 >
                                     <Pencil size={13} /> Edit
                                 </Link>

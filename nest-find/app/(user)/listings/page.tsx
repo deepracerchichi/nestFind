@@ -4,6 +4,7 @@ import {toast} from "react-hot-toast"
 import {Listing} from "@/types/listing";
 import {useCallback, useEffect, useState} from "react";
 import {fetchListings} from "@/lib/listings";
+import {CURRENCIES} from "@/lib/currency";
 import {Search} from "lucide-react";
 import ListingCard from "@/components/ListingCard";
 import {useRouter, useSearchParams} from "next/navigation";
@@ -15,6 +16,7 @@ export default function ListingsPage() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState(searchParams.get("search") ?? "");
     const [propertyType, setPropertyType] = useState("");
+    const [currency, setCurrency] = useState(searchParams.get("currency") ?? "NGN");
     const [maxPrice, setMaxPrice] = useState("");
 
     const loadListings = useCallback(async (signal?: AbortSignal) => {
@@ -25,7 +27,10 @@ export default function ListingsPage() {
         const params = new URLSearchParams();
         if (trimmedSearch) params.set("search", trimmedSearch);
         if (propertyType) params.set("propertyType", propertyType);
-        if (trimmedMaxPrice) params.set("maxPrice", trimmedMaxPrice);
+        if (trimmedMaxPrice) {
+            params.set("maxPrice", trimmedMaxPrice);
+            params.set("currency", currency);
+        }
         const query = params.toString();
         router.replace(query ? `/listings?${query}` : "/listings", { scroll: false });
 
@@ -34,6 +39,9 @@ export default function ListingsPage() {
             const data = await fetchListings({
                 search: trimmedSearch || undefined,
                 propertyType: propertyType || undefined,
+                // Only scope by currency when it's actually gating a price
+                // comparison - otherwise browsing should show every currency.
+                currency: trimmedMaxPrice ? currency : undefined,
                 maxPrice: trimmedMaxPrice && Number.isFinite(parsedMaxPrice) ? parsedMaxPrice : undefined
             }, signal);
             setListings(data.listings);
@@ -49,11 +57,12 @@ export default function ListingsPage() {
                 setLoading(false);
             }
         }
-    }, [search, propertyType, maxPrice, router])
+    }, [search, propertyType, currency, maxPrice, router])
 
     const clearFilters = () => {
         setSearch("");
         setPropertyType("");
+        setCurrency("NGN");
         setMaxPrice("");
         router.replace("/listings", {scroll: false});
     }
@@ -114,14 +123,23 @@ export default function ListingsPage() {
                         <option value="duplex">Duplex</option>
                     </select>
 
-                    <div className="glass flex items-center gap-1 rounded-full px-4 py-2">
-                        <span className="text-muted-foreground text-sm">₦</span>
+                    <div className="glass flex items-center gap-1 rounded-full pl-2 pr-4 py-2">
+                        <select
+                            value={currency}
+                            onChange={(e) => setCurrency(e.target.value)}
+                            aria-label="Currency"
+                            className="bg-transparent outline-none text-sm font-medium cursor-pointer"
+                        >
+                            {CURRENCIES.map((c) => (
+                                <option key={c.code} value={c.code}>{c.code}</option>
+                            ))}
+                        </select>
                         <input
                             type="number"
                             placeholder="Max price"
                             value={maxPrice}
                             onChange={(e) => setMaxPrice(e.target.value)}
-                            className="bg-transparent outline-none text-sm w-28 placeholder:text-muted-foreground"
+                            className="bg-transparent outline-none text-sm w-24 placeholder:text-muted-foreground"
                         />
                     </div>
 

@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {MapPin, BedDouble, Bath} from "lucide-react"
 import {usePathname, useSearchParams} from "next/navigation";
+import {formatPrice} from "@/lib/currency";
 
 
 export default function ListingCard({listing}: {listing: Listing}) {
@@ -36,7 +37,7 @@ export default function ListingCard({listing}: {listing: Listing}) {
                             {listing.title}
                         </h3>
                         <p className='text-xl font-other group-hover:text-primary shrink-0 ml-2'>
-                            ₦{listing.price.toLocaleString()}
+                            {formatPrice(listing.price, listing.currency)}
                         </p>
                     </div>
 

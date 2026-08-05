@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ImagePlus, X } from "lucide-react";
+import { ImagePlus, MinusIcon, PlusIcon, X } from "lucide-react";
+import { CURRENCIES } from "@/lib/currency";
 
 const AMENITIES = [
     "Parking", "24/7 Power", "Water Heater", "Air Conditioning", "Furnished",
@@ -13,6 +14,7 @@ export type ListingFormValues = {
     title: string;
     description: string;
     price: string;
+    currency: string;
     priceType: string;
     propertyType: string;
     bedrooms: number;
@@ -26,6 +28,7 @@ const DEFAULT_VALUES: ListingFormValues = {
     title: "",
     description: "",
     price: "",
+    currency: "NGN",
     priceType: "per month",
     propertyType: "apartment",
     bedrooms: 1,
@@ -106,14 +109,14 @@ export default function ListingForm({
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            <section className="glass rounded-3xl p-6">
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-4">
+        <form onSubmit={handleSubmit} className="font-other font-semibold text-md flex flex-col gap-5">
+            <section className="bg-background rounded-3xl p-6">
+                <h2 className="text-md font-semibold uppercase tracking-wide text-muted-foreground mb-4">
                     Basic details
                 </h2>
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">
-                        <label htmlFor="title" className="text-sm font-semibold">Title</label>
+                        <label htmlFor="title" className="text-md font-semibold">Title</label>
                         <input
                             id="title"
                             name="title"
@@ -121,11 +124,11 @@ export default function ListingForm({
                             value={form.title}
                             onChange={handleChange}
                             required
-                            className="bg-background border border-border rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                            className="glass border border-border rounded-lg px-3 py-2.5 text-md outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                         />
                     </div>
                     <div className="flex flex-col gap-1.5">
-                        <label htmlFor="description" className="text-sm font-semibold">Description</label>
+                        <label htmlFor="description" className="text-md font-semibold">Description</label>
                         <textarea
                             id="description"
                             name="description"
@@ -134,21 +137,32 @@ export default function ListingForm({
                             onChange={handleChange}
                             required
                             rows={4}
-                            className="bg-background border border-border rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 resize-y"
+                            className="glass border border-border rounded-lg px-3 py-2.5 text-md outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 resize-y"
                         />
                     </div>
                 </div>
             </section>
 
-            <section className="glass rounded-3xl p-6">
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-4">
+            <section className="bg-background rounded-3xl p-6">
+                <h2 className="text-md font-semibold uppercase tracking-wide text-muted-foreground mb-4">
                     Pricing
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1.5">
-                        <label htmlFor="price" className="text-sm font-semibold">Price</label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₦</span>
+                        <label htmlFor="price" className="text-md font-semibold">Price</label>
+                        <div className="flex rounded-lg border border-border overflow-hidden focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+                            <select
+                                id="currency"
+                                name="currency"
+                                value={form.currency}
+                                onChange={handleChange}
+                                aria-label="Currency"
+                                className="bg-backgrund border-r border-border px-2.5 text-md outline-none cursor-pointer font-medium"
+                            >
+                                {CURRENCIES.map((c) => (
+                                    <option key={c.code} value={c.code}>{c.code}</option>
+                                ))}
+                            </select>
                             <input
                                 id="price"
                                 name="price"
@@ -157,18 +171,18 @@ export default function ListingForm({
                                 value={form.price}
                                 onChange={handleChange}
                                 required
-                                className="bg-background border border-border rounded-lg pl-7 pr-3 py-2.5 text-sm w-full outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                className="glass px-3 py-2.5 text-md w-full outline-none"
                             />
                         </div>
                     </div>
                     <div className="flex flex-col gap-1.5">
-                        <label htmlFor="priceType" className="text-sm font-semibold">Billing period</label>
+                        <label htmlFor="priceType" className="text-md font-semibold">Billing period</label>
                         <select
                             id="priceType"
                             name="priceType"
                             value={form.priceType}
                             onChange={handleChange}
-                            className="bg-background border border-border rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                            className="bg-background border border-border rounded-lg px-3 py-2.5 text-md outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                         >
                             <option>per month</option>
                             <option>per year</option>
@@ -178,19 +192,19 @@ export default function ListingForm({
                 </div>
             </section>
 
-            <section className="glass rounded-3xl p-6">
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-4">
+            <section className="bg-background rounded-3xl p-6">
+                <h2 className="text-md font-other font-semibold uppercase tracking-wide text-muted-foreground mb-4">
                     Property details
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="flex flex-col gap-1.5">
-                        <label htmlFor="propertyType" className="text-sm font-semibold">Property type</label>
+                        <label htmlFor="propertyType" className="text-md font-semibold">Property type</label>
                         <select
                             id="propertyType"
                             name="propertyType"
                             value={form.propertyType}
                             onChange={handleChange}
-                            className="bg-background border border-border rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                            className="bg-background border border-border rounded-lg px-3 py-2.5 text-md outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                         >
                             <option value="apartment">Apartment</option>
                             <option value="house">House</option>
@@ -200,31 +214,31 @@ export default function ListingForm({
                         </select>
                     </div>
                     <div className="flex flex-col gap-1.5">
-                        <span className="text-sm font-semibold">Bedrooms</span>
+                        <span className="text-md font-semibold">Bedrooms</span>
                         <div className="flex items-center border border-border rounded-lg overflow-hidden">
                             <button type="button" onClick={() => adjustCount("bedrooms", -1)} className="w-9 h-10 hover:bg-muted">−</button>
-                            <span className="flex-1 text-center text-sm font-semibold">{form.bedrooms}</span>
+                            <span className="flex-1 text-center text-md font-semibold">{form.bedrooms}</span>
                             <button type="button" onClick={() => adjustCount("bedrooms", 1)} className="w-9 h-10 hover:bg-muted">+</button>
                         </div>
                     </div>
                     <div className="flex flex-col gap-1.5">
-                        <span className="text-sm font-semibold">Bathrooms</span>
+                        <span className="text-md font-other ">Bathrooms</span>
                         <div className="flex items-center border border-border rounded-lg overflow-hidden">
-                            <button type="button" onClick={() => adjustCount("bathrooms", -1)} className="w-9 h-10 hover:bg-muted">−</button>
-                            <span className="flex-1 text-center text-sm font-semibold">{form.bathrooms}</span>
-                            <button type="button" onClick={() => adjustCount("bathrooms", 1)} className="w-9 h-10 hover:bg-muted">+</button>
+                            <button type="button" onClick={() => adjustCount("bathrooms", -1)} className="w-9 h-10 hover:bg-foreground hover:text-background"><MinusIcon className="inline-block"/></button>
+                            <span className="flex-1 text-center text-md ">{form.bathrooms}</span>
+                            <button type="button" onClick={() => adjustCount("bathrooms", 1)} className="w-9 h-10 hover:bg-foreground hover:text-background  text-center"><PlusIcon className="inline-block" /></button>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section className="glass rounded-3xl p-6">
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-4">
+            <section className="bg-background rounded-3xl p-6">
+                <h2 className="text-md font-semibold uppercase tracking-wide text-muted-foreground mb-4">
                     Location
                 </h2>
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">
-                        <label htmlFor="address" className="text-sm font-semibold">Street address</label>
+                        <label htmlFor="address" className="text-md font-semibold">Street address</label>
                         <input
                             id="address"
                             name="address"
@@ -232,12 +246,12 @@ export default function ListingForm({
                             value={form.address}
                             onChange={handleChange}
                             required
-                            className="bg-background border border-border rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                            className="glass border border-border rounded-lg px-3 py-2.5 text-md outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                         />
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
-                            <label htmlFor="city" className="text-sm font-semibold">City</label>
+                            <label htmlFor="city" className="text-md font-semibold">City</label>
                             <input
                                 id="city"
                                 name="city"
@@ -245,11 +259,11 @@ export default function ListingForm({
                                 value={form.city}
                                 onChange={handleChange}
                                 required
-                                className="bg-background border border-border rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                className="glass border border-border rounded-lg px-3 py-2.5 text-md outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                             />
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <label htmlFor="state" className="text-sm font-semibold">State</label>
+                            <label htmlFor="state" className="text-md font-semibold">State</label>
                             <input
                                 id="state"
                                 name="state"
@@ -257,15 +271,15 @@ export default function ListingForm({
                                 value={form.state}
                                 onChange={handleChange}
                                 required
-                                className="bg-background border border-border rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                className="glass border border-border rounded-lg px-3 py-2.5 text-md outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                             />
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section className="glass rounded-3xl p-6">
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-4">
+            <section className="bg-background rounded-3xl p-6">
+                <h2 className="text-md font-semibold uppercase tracking-wide text-muted-foreground mb-4">
                     Amenities
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
@@ -276,7 +290,7 @@ export default function ListingForm({
                                 type="button"
                                 key={amenity}
                                 onClick={() => toggleAmenity(amenity)}
-                                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg border text-sm font-medium text-left transition-colors ${
+                                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg border text-md font-medium text-left transition-colors ${
                                     selected
                                         ? "border-primary bg-primary/10 text-primary"
                                         : "border-border hover:border-primary/50"
@@ -287,7 +301,7 @@ export default function ListingForm({
                                         selected ? "bg-primary text-primary-foreground" : "border border-border"
                                     }`}
                                 >
-                                    {selected ? "✓" : ""}
+                                    {/* {selected ? "✓" : ""} */}
                                 </span>
                                 {amenity}
                             </button>
@@ -296,8 +310,8 @@ export default function ListingForm({
                 </div>
             </section>
 
-            <section className="glass rounded-3xl p-6">
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-4">
+            <section className="bg-background rounded-3xl p-6">
+                <h2 className="text-md font-semibold uppercase tracking-wide text-muted-foreground mb-4">
                     Photos
                 </h2>
                 <label
@@ -355,14 +369,14 @@ export default function ListingForm({
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="border border-border px-6 py-2.5 rounded-full text-sm font-medium hover:bg-muted transition-colors"
+                    className="border border-border px-6 py-2.5 rounded-full text-md font-medium bg-background transition-colors"
                 >
                     Cancel
                 </button>
                 <button
                     type="submit"
                     disabled={loading}
-                    className="bg-primary text-primary-foreground px-6 py-2.5 rounded-full text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+                    className="bg-primary text-primary-foreground px-6 py-2.5 rounded-full text-md font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
                 >
                     {loading ? loadingLabel : submitLabel}
                 </button>

@@ -5,6 +5,7 @@ import {useParams, useSearchParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import {Listing} from "@/types/listing";
 import {fetchListing, toggleSaveListing} from "@/lib/listings";
+import {formatPrice} from "@/lib/currency";
 import {toast} from "react-hot-toast";
 import Image from "next/image";
 import Link from "next/link";
@@ -124,7 +125,7 @@ export default function ListingDetailPage() {
                 {/* Price + facts + contact */}
                 <div className="bg-foreground rounded-2xl p-6 space-y-5 sticky top-24">
                     <p className="text-3xl text-background font-bold">
-                        &#8358;{listing.price.toLocaleString()}
+                        {formatPrice(listing.price, listing.currency)}
                         <span className="text-sm font-other font-normal text-background">
                             /{listing.priceType.replace("per ", "")}
                         </span>
