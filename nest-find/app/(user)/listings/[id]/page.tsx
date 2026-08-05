@@ -123,19 +123,19 @@ export default function ListingDetailPage() {
 
                 {/* Price + facts + contact */}
                 <div className="bg-foreground rounded-2xl p-6 space-y-5 sticky top-24">
-                    <p className="text-3xl font-bold">
+                    <p className="text-3xl text-background font-bold">
                         &#8358;{listing.price.toLocaleString()}
-                        <span className="text-sm font-other font-normal text-muted-foreground">
+                        <span className="text-sm font-other font-normal text-background">
                             /{listing.priceType.replace("per ", "")}
                         </span>
                     </p>
 
                     <div className="flex items-center gap-4 font-other border-y border-border py-4">
-                        <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1.5 text-sm text-background">
                             <BedDouble size={18} className="text-primary" /> {listing.bedrooms} Bedrooms
                         </span>
 
-                        <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1.5 text-sm text-background">
                             <Bath size={18} className="text-primary" /> {listing.bathrooms} Bathrooms
                         </span>
                     </div>
@@ -145,7 +145,7 @@ export default function ListingDetailPage() {
                     </button>
 
                     <p className="text-xs text-center text-muted-foreground font-other">
-                        Posted by <span className="text-foreground font-medium">{listing.postedBy.username}</span>
+                        Posted by <span className="text-primary font-medium">{listing.postedBy.username}</span>
                     </p>
                 </div>
 

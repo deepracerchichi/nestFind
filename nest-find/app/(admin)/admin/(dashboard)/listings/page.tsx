@@ -129,7 +129,7 @@ export default function MyListingsPage() {
                                 <button
                                     disabled={busyId === listing._id}
                                     onClick={() => void handleToggleAvailability(listing)}
-                                    className="flex-1 border border-white/15 text-foreground rounded-full py-2 text-xs font-medium hover:bg-white/10 transition-colors disabled:opacity-50"
+                                    className="flex-1 border border-white/15 text-foreground rounded-full py-2 text-xs font-medium  transition-colors bg-background disabled:opacity-50"
                                 >
                                     {listing.isAvailable ? "Mark unavailable" : "Mark available"}
                                 </button>
