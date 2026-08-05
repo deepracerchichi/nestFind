@@ -12,17 +12,17 @@ export default function DashboardTabs() {
     const pathname = usePathname();
 
     return (
-        <nav className="flex gap-8 border-b border-border">
+        <nav className="inline-flex bg-foreground rounded-full p-1 gap-1">
             {TABS.map((tab) => {
                 const isActive = pathname === tab.href;
                 return (
                     <Link
                         key={tab.href}
                         href={tab.href}
-                        className={`pb-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                        className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
                             isActive
-                                ? "border-primary text-foreground"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
+                                ? "bg-primary text-primary-foreground"
+                                : "text-muted-foreground hover:text-background"
                         }`}
                     >
                         {tab.label}

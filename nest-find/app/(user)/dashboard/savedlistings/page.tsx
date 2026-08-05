@@ -46,7 +46,7 @@ export default function SavedListingsPage() {
 
     return (
         <div>
-            <h1 className="text-lg font-semibold mb-6">Saved listings</h1>
+            <h1 className="text-lg font-semibold text-background mb-6">Saved listings</h1>
 
             {loading ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
@@ -64,7 +64,7 @@ export default function SavedListingsPage() {
             ) : savedListings.length === 0 ? (
                 <div className="text-center py-24 space-y-4">
                     <p className="text-5xl">♡</p>
-                    <h3 className="text-xl font-semibold">No saved listings yet</h3>
+                    <h3 className="text-xl font-semibold text-background">No saved listings yet</h3>
                     <p className="text-muted-foreground font-other text-sm">
                         Tap the heart icon on any listing to save it here for later.
                     </p>

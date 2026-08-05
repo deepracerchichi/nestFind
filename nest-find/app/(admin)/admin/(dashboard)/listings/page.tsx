@@ -73,7 +73,7 @@ export default function MyListingsPage() {
 
     return (
         <div>
-            <h1 className="text-lg font-semibold mb-6">My listings</h1>
+            <h1 className="text-lg font-semibold text-background mb-6">My listings</h1>
 
             {loading ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
@@ -91,7 +91,7 @@ export default function MyListingsPage() {
             ) : myListings.length === 0 ? (
                 <div className="text-center py-24 space-y-4">
                     <p className="text-5xl">⌂</p>
-                    <h3 className="text-xl font-semibold">No listings yet</h3>
+                    <h3 className="text-xl font-semibold text-background">No listings yet</h3>
                     <p className="text-muted-foreground font-other text-sm">
                         Create your first listing to get it in front of buyers.
                     </p>
@@ -120,23 +120,23 @@ export default function MyListingsPage() {
                             </div>
 
                             <div className="flex gap-2 mt-3">
-                                <button
-                                    onClick={() => toast("Edit form is coming soon")}
-                                    className="flex-1 flex items-center justify-center gap-1.5 border border-border rounded-full py-2 text-xs font-medium hover:bg-muted transition-colors"
+                                <Link
+                                    href={`/admin/listings/${listing._id}/edit`}
+                                    className="flex-1 flex items-center justify-center gap-1.5 bg-background text-foreground rounded-full py-2 text-xs font-medium hover:bg-white/10 transition-colors"
                                 >
                                     <Pencil size={13} /> Edit
-                                </button>
+                                </Link>
                                 <button
                                     disabled={busyId === listing._id}
                                     onClick={() => void handleToggleAvailability(listing)}
-                                    className="flex-1 border border-border rounded-full py-2 text-xs font-medium hover:bg-muted transition-colors disabled:opacity-50"
+                                    className="flex-1 border border-white/15 text-foreground rounded-full py-2 text-xs font-medium hover:bg-white/10 transition-colors disabled:opacity-50"
                                 >
                                     {listing.isAvailable ? "Mark unavailable" : "Mark available"}
                                 </button>
                                 <button
                                     disabled={busyId === listing._id}
                                     onClick={() => void handleDelete(listing)}
-                                    className="flex-1 flex items-center justify-center gap-1.5 border border-destructive/40 text-destructive rounded-full py-2 text-xs font-medium hover:bg-destructive/10 transition-colors disabled:opacity-50"
+                                    className="flex-1 flex items-center justify-center gap-1.5 bg-background border border-destructive/40 text-destructive rounded-full py-2 text-xs font-medium hover:bg-destructive/10 transition-colors disabled:opacity-50"
                                 >
                                     <Trash2 size={13} /> Delete
                                 </button>

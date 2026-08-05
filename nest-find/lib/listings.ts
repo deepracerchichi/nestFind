@@ -35,7 +35,7 @@ export const fetchMyListings = async (signal?: AbortSignal): Promise<Listing[]> 
     return res.data.listings;
 }
 
-export const updateListing = async (id: string, data: Partial<Pick<Listing, "isAvailable">>) => {
+export const updateListing = async (id: string, data: Partial<Omit<Listing, "_id" | "postedBy" | "createdAt">>) => {
     const res = await api.patch(`/api/listings/${id}`, data);
     return res.data;
 }

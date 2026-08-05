@@ -40,14 +40,17 @@ export default function DashboardOverviewPage() {
     return (
         <div>
             {/* Hero */}
-            <div className="glass-strong rounded-3xl p-8 flex items-center justify-between gap-6 flex-wrap mb-6">
+            <div className="bg-background rounded-3xl p-8 flex items-center justify-between gap-6 flex-wrap mb-6 animate-fade-in">
                 <div className="flex items-center gap-4">
                     <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground font-semibold text-xl flex items-center justify-center shrink-0">
                         {user?.username.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                        <h1 className="text-xl font-semibold">Welcome back, {user?.username}</h1>
-                        <p className="text-muted-foreground text-sm">{user?.email}</p>
+                        <p className="uppercase font-other text-xs tracking-wide text-muted-foreground mb-1">Your Dashboard</p>
+                        <h1 className="text-2xl md:text-3xl font-bold leading-tight">
+                            Welcome back, <span className="text-primary glow-text">{user?.username}</span>
+                        </h1>
+                        <p className="text-muted-foreground text-sm mt-1">{user?.email}</p>
                     </div>
                 </div>
                 <Link
@@ -60,7 +63,7 @@ export default function DashboardOverviewPage() {
 
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
-                <div className="glass rounded-2xl p-5">
+                <div className="bg-background rounded-2xl p-5">
                     <p className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2 mb-2">
                         <Heart size={14} /> Saved listings
                     </p>
@@ -68,7 +71,7 @@ export default function DashboardOverviewPage() {
                         {loading ? "—" : savedListings.length}
                     </p>
                 </div>
-                <div className="glass rounded-2xl p-5">
+                <div className="bg-background rounded-2xl p-5">
                     <p className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2 mb-2">
                         <TrendingUp size={14} /> Avg. saved price
                     </p>
@@ -80,7 +83,7 @@ export default function DashboardOverviewPage() {
 
             {/* Recently saved */}
             <div className="flex items-baseline justify-between mb-4">
-                <h2 className="text-lg font-semibold">Recently saved</h2>
+                <h2 className="text-lg font-semibold text-background">Recently saved</h2>
                 {savedListings.length > 0 && (
                     <Link href="/dashboard/savedlistings" className="text-primary text-sm font-medium hover:opacity-80">
                         View all →
