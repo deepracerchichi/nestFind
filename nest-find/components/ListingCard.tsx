@@ -13,7 +13,7 @@ export default function ListingCard({listing}: {listing: Listing}) {
 
     const query = searchParams.toString();
     const from = `${pathname}${query ? `?${query}` : ""}`;
-    const detailHref = `listings/${listing._id}?from=${encodeURIComponent(from)}`;
+    const detailHref = `/listings/${listing._id}?from=${encodeURIComponent(from)}`;
 
     return (
         <Link href={detailHref}>
