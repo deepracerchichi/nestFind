@@ -21,10 +21,11 @@ router.post("/", verifyToken, verifyRole("admin"), createListing);
 // Must come before "/:id" - otherwise Express matches "/me" as {id: "me"}
 // and getOneListing tries (and fails) to findById("me").
 router.get("/me", verifyToken, verifyRole("admin"), getMyListings);
+// Must come before "/:id" for the same reason as "/me" above.
+router.get("/pending-verification", verifyToken, verifyRole("moderator"), getPendingVerifications);
 router.patch("/:id", verifyToken, updateListing);
 router.delete("/:id", verifyToken, deleteListing);
 router.get("/:id", getOneListing);
-router.get("/pending-verification", verifyToken, verifyRole("moderator"), getPendingVerifications);
 router.patch("/:id/verify", verifyToken, verifyRole("moderator"), verifyListing);
 router.post("/:id/report", verifyToken, createReport);
 
