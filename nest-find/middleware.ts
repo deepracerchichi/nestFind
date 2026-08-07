@@ -13,13 +13,20 @@ export async function middleware(request: NextRequest) {
     try {
       const { payload } = await jwtVerify(token, accessTokenSecret);
       const role = payload.role as string;
+      // Each role has exactly one home area; anyone hitting a section that
+      // isn't theirs gets bounced back to their own instead of a fixed page.
+      const home = role === "admin" ? "/admin" : role === "moderator" ? "/moderator" : "/dashboard";
 
       if (pathname.startsWith("/admin") && role !== "admin") {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
+        return NextResponse.redirect(new URL(home, request.url));
       }
 
-      if (pathname.startsWith("/dashboard") && role === "admin") {
-        return NextResponse.redirect(new URL("/admin", request.url));
+      if (pathname.startsWith("/moderator") && role !== "moderator") {
+        return NextResponse.redirect(new URL(home, request.url));
+      }
+
+      if (pathname.startsWith("/dashboard") && role !== "user") {
+        return NextResponse.redirect(new URL(home, request.url));
       }
 
       return NextResponse.next();

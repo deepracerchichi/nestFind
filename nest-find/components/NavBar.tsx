@@ -6,6 +6,9 @@ import Link from "next/link";
 import Image from "next/image";
 import {useAuth} from "@/context/AuthContext";
 
+const dashboardHref = (role: string) =>
+    role === "admin" ? "/admin" : role === "moderator" ? "/moderator" : "/dashboard";
+
 export const NavBar= () => {
     // const headerRef = useRef<HTMLElement>(null);
     const [isMobile, setIsMobile] = useState(false);
@@ -86,7 +89,7 @@ export const NavBar= () => {
                                     </div>
 
                                     <Link
-                                        href={user.role === "admin" ? "/admin" : "/dashboard"}
+                                        href={dashboardHref(user.role)}
                                         onClick={() => setIsProfileOpen(false)}
                                         className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-foreground hover:text-background transition-colors"
                                     >
@@ -149,7 +152,7 @@ export const NavBar= () => {
                         {user ? (
                             <>
                                 <Link
-                                    href={user.role === "admin" ? "/admin" : "/dashboard"}
+                                    href={dashboardHref(user.role)}
                                     onClick={()=> setIsMobile(false)}
                                     className="text-lg text-background hover:text-background py-2"
                                 >
