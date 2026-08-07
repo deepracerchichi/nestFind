@@ -1,4 +1,5 @@
 import Listing from "../models/listing.js";
+import Report from "../models/report.js";
 
 export const getListings = async (req, res) => {
     try {
@@ -71,10 +72,12 @@ export const getOneListing = async (req, res) => {
 //POST /api/savedlistings - create a listing (admin only).
 export const createListing = async (req, res) => {
     try {
-        const {title, description, price, currency, priceType, propertyType, bedrooms, bathrooms, location, amenities, images} = req.body;
+        const {title, description, price, currency, verificationDocument, priceType, propertyType, bedrooms, bathrooms, location, amenities, images} = req.body;
         const listing = new Listing({
             title, description, price, currency, priceType, propertyType,
             bedrooms, bathrooms, location, amenities, images,
+            verificationDocument,
+            verificationStatus: verificationDocument ? "pending" :"unverified",
             postedBy: req.user.id, //comes from verifyToken middleware
         });
         await listing.save();
@@ -100,11 +103,16 @@ export const updateListing = async (req, res) => {
         const {
             title, description, price, currency, priceType, propertyType,
             bedrooms, bathrooms, location, amenities, images, isAvailable,
+            verificationDocument,
         } = req.body;
         const updates = {
             title, description, price, currency, priceType, propertyType,
             bedrooms, bathrooms, location, amenities, images, isAvailable,
+            verificationDocument,
         };
+        if(verificationDocument !== undefined) {
+            updates.verificationStatus = "pending";
+        }
         Object.keys(updates).forEach((key) => updates[key] === undefined && delete updates[key]);
 
         const updated = await Listing.findByIdAndUpdate(req.params.id, updates, {new: true}); //return the new updated doc not the old one
@@ -140,6 +148,64 @@ export const getMyListings = async (req, res) => {
         res.status(200).json({listings, total: listings.length})
     } catch (e) {
         console.error("Error getting your savedlistings", e);
+        res.status(500).json({message: "Server error"});
+    }
+}
+
+export const getPendingVerifications = async (req, res) => {
+    try {
+        const listings = await Listing.find({verificationStatus: "pending"})
+            .populate("postedBy", "username email")
+            .sort({createdAt: 1}); //oldest first -fair queue order
+        res.status(200).json({listings, total:listings.length});
+    } catch (e) {
+        console.error("Error getting pending verifications", e);
+        res.status(500).json({message: "Server error"});
+    }
+}
+
+
+export const verifyListing = async (req, res) => {
+    try {
+        const {status, note} = req.body;
+        if(!["verified", "rejected"].includes(status)) {
+            return res.status(400).json({message: "Status must be 'verified' or 'rejected'"});
+        }
+
+        const listing = await Listing.findById(req.params.id);
+        if(!listing) return res.status(404).json({message: "Listing not found"})
+        
+            listing.verificationStatus = status;
+            listing.verificationNote = note || "";
+            await listing.save();
+
+            res.status(200).json({message: "Listing verification updated", listing});
+
+    } catch (e) {
+        console.error("Error verifying listing", e);
+        res.status(500).json({message: "Server Error"});
+    }
+}
+
+// POST /api/listings/:id/report
+export const createReport = async (req, res) => {
+    try {
+        const { reason } = req.body;
+        if (!reason) return res.status(400).json({message: "A reason is required"});
+
+        const listing = await Listing.findById(req.params.id);
+        if (!listing) return res.status(404).json({message: "Listing not found"});
+
+        const report = new Report({
+            listing: listing._id,
+            reportedBy: req.user.id,
+            reason,
+        });
+        await report.save();
+
+        res.status(200).json({message: "Report submitted"});
+    } catch (e) {
+        console.error("Error creating report", e);
         res.status(500).json({message: "Server error"});
     }
 }

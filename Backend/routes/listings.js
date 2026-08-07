@@ -4,7 +4,10 @@ import {
     deleteListing,
     getListings, getMyListings,
     getOneListing,
-    updateListing
+    updateListing,
+    getPendingVerifications,
+    verifyListing,
+    createReport
 } from "../controllers/listingController.js";
 import {verifyRole, verifyToken} from "../middleware/authMiddleware.js";
 
@@ -21,5 +24,8 @@ router.get("/me", verifyToken, verifyRole("admin"), getMyListings);
 router.patch("/:id", verifyToken, updateListing);
 router.delete("/:id", verifyToken, deleteListing);
 router.get("/:id", getOneListing);
+router.get("/pending-verification", verifyToken, verifyRole("moderator"), getPendingVerifications);
+router.patch("/:id/verify", verifyToken, verifyRole("moderator"), verifyListing);
+router.post("/:id/report", verifyToken, createReport);
 
 export default router;

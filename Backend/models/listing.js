@@ -10,6 +10,13 @@ const listingSchema = new mongoose.Schema(
             enum: ["NGN", "USD", "GBP", "EUR", "GHS", "KES", "ZAR"],
             default: "NGN",
         },
+        verificationStatus: {
+            type: String,
+            enum: ["unverified", "pending", "verified", "rejected"],
+            default: "unverified",
+        },
+        verificationDocument:{type: String}, // Cloudinary URL of the uploaded proof-of-ownership doc
+        verificationNote: {type: String}, // moderator's reason, shown to the seller mainly on rejection
         priceType: {
             type: String,
             enum: ["per month", "per year", "per night"],

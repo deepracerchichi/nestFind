@@ -7,6 +7,8 @@ import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
 import listingRoutes from "./routes/listings.js"
 import uploadRoutes from "./routes/upload.js"
+import reportRoutes from "./routes/reports.js";
+
 
 const port = process.env.PORT
 const app = express();
@@ -22,8 +24,10 @@ app.use(cookieParser()); //for the middleware
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/listings", listingRoutes)
-app.use("/api/upload", uploadRoutes)
+app.use("/api/listings", listingRoutes);
+app.use("/api/upload", uploadRoutes);
+app.use("/api/reports", reportRoutes);
+
 connectDB();
 
 app.listen(port, () => {
