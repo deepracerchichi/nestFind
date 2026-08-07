@@ -28,7 +28,7 @@ export default function EditListingPage() {
             .finally(() => setLoading(false));
     }, [id, router]);
 
-    const handleSubmit = async ({ form, amenities, existingImages, newImageFiles }: ListingFormSubmission) => {
+    const handleSubmit = async ({ form, amenities, existingImages, newImageFiles, existingVerificationDocument, newVerificationDocumentFile }: ListingFormSubmission) => {
         try {
             let newUrls: string[] = [];
             if (newImageFiles.length > 0) {
@@ -41,11 +41,22 @@ export default function EditListingPage() {
                 newUrls = uploadRes.data.urls;
             }
 
+            let verificationDocument = existingVerificationDocument ?? undefined;
+            if (newVerificationDocumentFile) {
+                const docFormData = new FormData();
+                docFormData.append("images", newVerificationDocumentFile);
+                const docUploadRes = await api.post("/api/upload", docFormData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
+                verificationDocument = docUploadRes.data.urls[0];
+            }
+
             await updateListing(id as string, {
                 ...form,
                 price: parseInt(form.price),
                 images: [...existingImages, ...newUrls],
                 amenities,
+                verificationDocument,
                 location: { address: form.address, city: form.city, state: form.state },
             });
 
@@ -105,6 +116,7 @@ export default function EditListingPage() {
                         }}
                         initialAmenities={listing.amenities}
                         initialImages={listing.images}
+                        initialVerificationDocument={listing.verificationDocument}
                         submitLabel="Save changes"
                         loadingLabel="Saving..."
                         onCancel={() => router.push("/admin/listings")}

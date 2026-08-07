@@ -1,6 +1,6 @@
 "use client"
 
-import {Bath, BedDouble, BookmarkIcon, ChevronRight, Droplets, MapPin, Shield, Wifi, Zap} from "lucide-react";
+import {BadgeCheck, Bath, BedDouble, BookmarkIcon, ChevronRight, Droplets, MapPin, Shield, Wifi, Zap} from "lucide-react";
 import {useParams, useSearchParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import {Listing} from "@/types/listing";
@@ -103,7 +103,14 @@ export default function ListingDetailPage() {
             <div className="lg:w-1/3 space-y-6">
                 <div className="flex items-start justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold">{listing.title}</h1>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-2xl font-bold">{listing.title}</h1>
+                            {listing.verificationStatus === "verified" && (
+                                <span className="flex items-center gap-1 text-xs font-other font-semibold px-2.5 py-1 rounded-full bg-primary/10 text-primary shrink-0">
+                                    <BadgeCheck size={14} /> Verified
+                                </span>
+                            )}
+                        </div>
 
                         <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground font-other">
                             <MapPin size={16} className="shrink-0" />

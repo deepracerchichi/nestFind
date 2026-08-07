@@ -45,3 +45,19 @@ export const deleteListing = async (id: string) => {
     const res = await api.delete(`/api/listings/${id}`);
     return res.data;
 }
+
+export const submitReport = async (listingId: string, reason: string) => {
+    const res = await api.post(`/api/listings/${listingId}/report`, { reason });
+    return res.data;
+}
+
+export const fetchPendingVerifications = async (signal?: AbortSignal): Promise<Listing[]> => {
+    const res = await api.get<{ listings: Listing[] }>("/api/listings/pending-verification", { signal });
+    return res.data.listings;
+}
+
+export const decideVerification = async (listingId: string, status: "verified" | "rejected", note?: string) => {
+    const res = await api.patch(`/api/listings/${listingId}/verify`, { status, note });
+    return res.data;
+}
+

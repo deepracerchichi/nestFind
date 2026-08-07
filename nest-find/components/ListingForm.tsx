@@ -22,6 +22,7 @@ export type ListingFormValues = {
     address: string;
     city: string;
     state: string;
+    
 };
 
 const DEFAULT_VALUES: ListingFormValues = {
@@ -43,12 +44,16 @@ export type ListingFormSubmission = {
     amenities: string[];
     existingImages: string[];
     newImageFiles: File[];
+    existingVerificationDocument: string | null;
+    newVerificationDocumentFile: File | null;
+
 };
 
 type Props = {
     initialValues?: Partial<ListingFormValues>;
     initialAmenities?: string[];
     initialImages?: string[];
+    initialVerificationDocument?: string;
     submitLabel: string;
     loadingLabel: string;
     onCancel: () => void;
@@ -59,6 +64,7 @@ export default function ListingForm({
     initialValues,
     initialAmenities = [],
     initialImages = [],
+    initialVerificationDocument,
     submitLabel,
     loadingLabel,
     onCancel,
@@ -67,6 +73,22 @@ export default function ListingForm({
     const [loading, setLoading] = useState(false);
     const [imageFiles, setImageFiles] = useState<File[]>([]);
     const [existingImages, setExistingImages] = useState<string[]>(initialImages);
+    const [verificationDocumentFile, setVerificationDocumentFile] = useState<File | null>(null);
+    const [existingVerificationDocument, setExistingVerificationDocument] = useState<string | null>(
+        initialVerificationDocument ?? null
+    );
+
+    const verificationDocumentPreview = useMemo(
+        () => (verificationDocumentFile ? URL.createObjectURL(verificationDocumentFile) : null),
+        [verificationDocumentFile]
+    );
+
+    useEffect(() => {
+        return () => {
+            if (verificationDocumentPreview) URL.revokeObjectURL(verificationDocumentPreview);
+        };
+    }, [verificationDocumentPreview]);
+
     const [amenities, setAmenities] = useState<string[]>(initialAmenities);
     const [form, setForm] = useState<ListingFormValues>({ ...DEFAULT_VALUES, ...initialValues });
 
@@ -102,7 +124,7 @@ export default function ListingForm({
         e.preventDefault();
         setLoading(true);
         try {
-            await onSubmit({ form, amenities, existingImages, newImageFiles: imageFiles });
+            await onSubmit({ form, amenities, existingImages, newImageFiles: imageFiles, existingVerificationDocument, newVerificationDocumentFile: verificationDocumentFile });
         } finally {
             setLoading(false);
         }
@@ -309,6 +331,50 @@ export default function ListingForm({
                     })}
                 </div>
             </section>
+
+            <section className="bg-background rounded-3xl p-6">
+                <h2 className="text-md font-semibold uppercase tracking-wide text-muted-foreground mb-4">
+                    Proof of ownership <span className="normal-case font-normal text-muted-foreground/70">(optional)</span>
+                </h2>
+                <p className="text-sm text-muted-foreground mb-3">
+                    Upload a photo of your Certificate of Occupancy or Deed of Assignment to earn a Verified badge once a moderator reviews it.
+                </p>
+
+                {verificationDocumentPreview || existingVerificationDocument ? (
+                    <div className="relative aspect-video max-w-xs rounded-lg overflow-hidden bg-muted">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src={verificationDocumentPreview ?? existingVerificationDocument!}
+                            alt="Proof of ownership"
+                            className="w-full h-full object-cover"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setVerificationDocumentFile(null);
+                                setExistingVerificationDocument(null);
+                            }}
+                            className="absolute top-1 right-1 h-5 w-5 rounded-full bg-black/60 text-white flex items-center justify-center"
+                        >
+                            <X size={12} />
+                        </button>
+                    </div>
+                ) : (
+                    <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-border rounded-2xl py-8 text-sm text-muted-foreground cursor-pointer hover:border-primary hover:text-primary transition-colors">
+                        <ImagePlus size={22} />
+                        Click to upload a document photo
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                                if (e.target.files?.[0]) setVerificationDocumentFile(e.target.files[0]);
+                            }}
+                            className="hidden"
+                        />
+                    </label>
+                )}
+            </section>
+
 
             <section className="bg-background rounded-3xl p-6">
                 <h2 className="text-md font-semibold uppercase tracking-wide text-muted-foreground mb-4">

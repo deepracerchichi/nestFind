@@ -1,7 +1,7 @@
 import {Listing} from "@/types/listing";
 import Link from "next/link";
 import Image from "next/image";
-import {MapPin, BedDouble, Bath} from "lucide-react"
+import {MapPin, BedDouble, Bath, BadgeCheck} from "lucide-react"
 import {usePathname, useSearchParams} from "next/navigation";
 import {formatPrice} from "@/lib/currency";
 
@@ -20,6 +20,12 @@ export default function ListingCard({listing}: {listing: Listing}) {
             <div className='group glass rounded-2xl overflow-hidden animate-fade-in md:row-span-1'>
 
                 <div className='relative overflow-hidden aspect-video'>
+                    {listing.verificationStatus === "verified" && (
+                        <span className="absolute top-3 left-3 glass-strong text-xs font-other px-3 py-1 rounded-full flex items-center gap-1 text-primary">
+                            <BadgeCheck size={14} /> Verified
+                        </span>
+                    )}
+
                     <Image
                         src={firstImage}
                         alt={listing.title}

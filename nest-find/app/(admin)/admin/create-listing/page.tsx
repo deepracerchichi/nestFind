@@ -10,17 +10,26 @@ import ListingForm, { type ListingFormSubmission } from "@/components/ListingFor
 export default function CreateListingPage() {
     const router = useRouter();
 
-    const handleSubmit = async ({ form, amenities, newImageFiles }: ListingFormSubmission) => {
+    const handleSubmit = async ({ form, amenities, newImageFiles, existingVerificationDocument, newVerificationDocumentFile }: ListingFormSubmission) => {
         try {
             let imageUrls: string[] = [];
             if (newImageFiles.length > 0) {
                 const formData = new FormData();
                 newImageFiles.forEach((file) => formData.append("images", file));
-
                 const uploadRes = await api.post("/api/upload", formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
                 imageUrls = uploadRes.data.urls;
+            }
+
+            let verificationDocument = existingVerificationDocument ?? undefined;
+            if (newVerificationDocumentFile) {
+                const docFormData = new FormData();
+                docFormData.append("images", newVerificationDocumentFile);
+                const docUploadRes = await api.post("/api/upload", docFormData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
+                verificationDocument = docUploadRes.data.urls[0];
             }
 
             await api.post("/api/listings", {
@@ -28,6 +37,7 @@ export default function CreateListingPage() {
                 price: parseInt(form.price),
                 images: imageUrls,
                 amenities,
+                verificationDocument,
                 location: { address: form.address, city: form.city, state: form.state },
             });
 
@@ -38,6 +48,7 @@ export default function CreateListingPage() {
             toast.error("Failed to create listing, try again");
         }
     };
+
 
     return (
         <div className="min-h-screen flex flex-col">

@@ -5,6 +5,9 @@ export type Listing = {
     description: string;
     price: number;
     currency: string;
+    verificationStatus: "unverified" | "pending" | "verified" | "rejected";
+    verificationDocument?: string;
+    verificationNote?: string;
     priceType: string;
     propertyType: string;
     bedrooms: number;
