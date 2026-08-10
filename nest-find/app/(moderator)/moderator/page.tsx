@@ -6,6 +6,8 @@ import { Clock, ListChecks } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { fetchPendingVerifications, decideVerification } from "@/lib/listings";
 import type { Listing } from "@/types/listing";
+import ModeratorTabs from "@/components/ModeratorTabs";
+
 
 export default function ModeratorQueuePage() {
     const { user } = useAuth();
@@ -59,6 +61,10 @@ export default function ModeratorQueuePage() {
             <div className="h-24 bg-background" />
             <div className="bg-foreground flex-1 px-6 md:px-14 pt-8 pb-24">
                 <div className="max-w-6xl mx-auto">
+                    <div className="mb-8">
+                        <ModeratorTabs />
+                    </div>
+
                     {/* Hero */}
                     <div className="bg-background rounded-3xl p-8 flex items-center gap-4 mb-6 animate-fade-in">
                         <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground font-semibold text-xl flex items-center justify-center shrink-0">
@@ -106,10 +112,10 @@ export default function ModeratorQueuePage() {
                     ) : (
                         <div className="space-y-5">
                             {pending.map((listing) => (
-                                <div key={listing._id} className="glass rounded-2xl p-5 space-y-3">
+                                <div key={listing._id} className="bg-background rounded-2xl p-5 space-y-3">
                                     <div className="flex items-start justify-between gap-4">
                                         <div>
-                                            <h3 className="font-semibold text-background">{listing.title}</h3>
+                                            <h3 className="text-2xl text-foreground">{listing.title}</h3>
                                             <p className="text-xs text-muted-foreground">
                                                 {listing.location.address}, {listing.location.city}, {listing.location.state}
                                             </p>
@@ -135,7 +141,7 @@ export default function ModeratorQueuePage() {
                                         onChange={(e) =>
                                             setNotes((current) => ({ ...current, [listing._id]: e.target.value }))
                                         }
-                                        className="w-full text-sm rounded-lg bg-background text-foreground p-2.5"
+                                        className="w-full text-sm rounded-lg glass text-foreground p-2.5"
                                         rows={2}
                                     />
 

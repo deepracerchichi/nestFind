@@ -25,7 +25,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${calsans.variable} ${afacad.variable}`}>
+      <body className={`${calsans.variable} ${afacad.variable}`} suppressHydrationWarning>
         <AuthProvider initialUser={initialUser}>{children}</AuthProvider>
       </body>
     </html>

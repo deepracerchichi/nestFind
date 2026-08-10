@@ -1,10 +1,10 @@
 "use client"
 
-import {BadgeCheck, Bath, BedDouble, BookmarkIcon, ChevronRight, Droplets, MapPin, Shield, Wifi, Zap} from "lucide-react";
+import {BadgeCheck, Bath, BedDouble, BookmarkIcon, Flag, ChevronRight, Droplets, MapPin, Shield, Wifi, Zap} from "lucide-react";
 import {useParams, useSearchParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import {Listing} from "@/types/listing";
-import {fetchListing, toggleSaveListing} from "@/lib/listings";
+import {fetchListing, toggleSaveListing, submitReport} from "@/lib/listings";
 import {formatPrice} from "@/lib/currency";
 import {toast} from "react-hot-toast";
 import Image from "next/image";
@@ -14,7 +14,7 @@ const amenityIcons: Record<string, any> = {
     Wifi: Wifi,
     Generator: Zap,
     Water: Droplets,
-    Security: Shield,
+    Security: Shield,  
 }
 
 export default function ListingDetailPage() {
@@ -25,6 +25,10 @@ export default function ListingDetailPage() {
     const [listing, setListing] = useState<Listing | null>(null)
     const [saved, setSaved] = useState(false);
     const [activeImage, setActiveImage] = useState(0);
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [reportReason, setReportReason] = useState("");
+    const [submittingReport, setSubmittingReport] = useState(false);
+
 
     useEffect(
         ()=> {
@@ -44,6 +48,23 @@ export default function ListingDetailPage() {
 
         }
     };
+
+    const handleSubmitReport = async () => {
+        if (!listing || !reportReason.trim()) return;
+        setSubmittingReport(true);
+        try {
+            await submitReport(listing._id, reportReason.trim());
+            toast.success("Report submitted - thanks for flagging this");
+            setIsReportModalOpen(false);
+            setReportReason("");
+        } catch (e) {
+            console.error("Error submitting report", e);
+            toast.error("Couldn't submit report, try again");
+        } finally {
+            setSubmittingReport(false);
+        }
+    };
+
 
     if (!listing) return <div>Loading...</div>;
 
@@ -152,10 +173,19 @@ export default function ListingDetailPage() {
                         Contact Landlord
                     </button>
 
-                    <p className="text-xs text-center text-muted-foreground font-other">
+                                        <p className="text-xs text-center text-muted-foreground font-other">
                         Posted by <span className="text-primary font-medium">{listing.postedBy.username}</span>
                     </p>
+
+                    <button
+                        type="button"
+                        onClick={() => setIsReportModalOpen(true)}
+                        className="w-full flex items-center justify-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-colors"
+                    >
+                        <Flag size={12} /> Report this listing
+                    </button>
                 </div>
+
 
                 <div>
                     <h2 className="uppercase font-other text-sm text-muted-foreground mb-2">Description</h2>
@@ -183,6 +213,48 @@ export default function ListingDetailPage() {
                 )}
             </div>
             </div>
+
+            {isReportModalOpen && (
+                <div
+                    className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-6"
+                    onClick={() => setIsReportModalOpen(false)}
+                >
+                    <div
+                        className="bg-background rounded-2xl p-6 max-w-sm w-full space-y-4"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h2 className="text-lg font-semibold">Report this listing</h2>
+                        <p className="text-sm text-muted-foreground">
+                            Let us know what&apos;s wrong — our team will review it.
+                        </p>
+                        <textarea
+                            value={reportReason}
+                            onChange={(e) => setReportReason(e.target.value)}
+                            placeholder="e.g. This property doesn't exist, or the seller isn't the real owner..."
+                            rows={4}
+                            className="w-full border border-border rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 resize-y"
+                        />
+                        <div className="flex justify-end gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setIsReportModalOpen(false)}
+                                className="border border-border px-4 py-2 rounded-full text-sm font-medium hover:bg-muted transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                disabled={!reportReason.trim() || submittingReport}
+                                onClick={handleSubmitReport}
+                                className="bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+                            >
+                                {submittingReport ? "Submitting..." : "Submit report"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }

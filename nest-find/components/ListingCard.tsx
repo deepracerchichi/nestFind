@@ -20,18 +20,19 @@ export default function ListingCard({listing}: {listing: Listing}) {
             <div className='group glass rounded-2xl overflow-hidden animate-fade-in md:row-span-1'>
 
                 <div className='relative overflow-hidden aspect-video'>
-                    {listing.verificationStatus === "verified" && (
-                        <span className="absolute top-3 left-3 glass-strong text-xs font-other px-3 py-1 rounded-full flex items-center gap-1 text-primary">
-                            <BadgeCheck size={14} /> Verified
-                        </span>
-                    )}
-
                     <Image
                         src={firstImage}
                         alt={listing.title}
                         fill
                         className='object-cover transition-transform duration-700 group-hover:scale-110'
                     />
+
+                    {listing.verificationStatus === "verified" && (
+                        <span className="absolute top-3 left-3 glass-strong text-xs font-other px-3 py-1 rounded-full flex items-center gap-1 text-primary">
+                            <BadgeCheck size={14} /> Verified
+                        </span>
+                    )}
+
                     <span className="absolute top-3 right-3 glass text-xs font-other px-3 py-1 rounded-full">
                         /{listing.priceType.replace("per ", "")}
                     </span>
