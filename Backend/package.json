@@ -23,7 +23,8 @@
     "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^9.0.4",
     "react-hot-toast": "^2.6.0",
-    "resend": "^6.18.1"
+    "resend": "^6.18.1",
+    "socket.io": "^4.8.3"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
