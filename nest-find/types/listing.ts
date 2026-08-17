@@ -22,6 +22,7 @@ export type Listing = {
     amenities: string[];
     isAvailable: boolean;
     postedBy: {
+        _id: string;
         username: string;
         email: string;
     };

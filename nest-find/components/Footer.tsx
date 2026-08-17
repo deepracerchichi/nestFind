@@ -17,8 +17,9 @@ const Footer = () => {
             <div className="">
 
                 <p className="">
-                    2026 All Rights Reserved. © nestFind
+                    &copy; {new Date().getFullYear()} nestFind. All rights reserved.
                 </p>
+
             </div>
 
             <div className="">

@@ -1,13 +1,11 @@
 "use client"
 import {useEffect, useRef, useState} from "react";
-import {LayoutDashboard, LogOut, MapPin, MenuIcon, XIcon} from "lucide-react";
+import {LayoutDashboard, LogOut, MapPin, MenuIcon, MessageCircle, XIcon} from "lucide-react";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {useAuth} from "@/context/AuthContext";
-
-const dashboardHref = (role: string) =>
-    role === "admin" ? "/admin" : role === "moderator" ? "/moderator" : "/dashboard";
+import {dashboardHref, messagesHref} from "@/lib/routes";
 
 export const NavBar= () => {
     // const headerRef = useRef<HTMLElement>(null);
@@ -15,7 +13,7 @@ export const NavBar= () => {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const profileRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
-    const {user, logout} = useAuth();
+    const {user, logout, unreadCount} = useAuth();
     const [isScrolled, setIsScrolled] = useState(false);
 
     useEffect(() => {
@@ -73,6 +71,21 @@ export const NavBar= () => {
 
                 <div className="hidden md:flex md:items-center md:gap-4">
                     {user ? (
+                        <div className="flex items-center gap-3">
+                        {user.role !== "moderator" && (
+                            <Link
+                                href={messagesHref(user.role)}
+                                className="relative h-9 w-9 rounded-full glass flex items-center justify-center hover:bg-primary/10 transition-colors"
+                            >
+                                <MessageCircle size={18} />
+                                {unreadCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 h-4 min-w-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold flex items-center justify-center">
+                                        {unreadCount > 9 ? "9+" : unreadCount}
+                                    </span>
+                                )}
+                            </Link>
+                        )}
+
                         <div className="relative" ref={profileRef}>
                             <button
                                 onClick={() => setIsProfileOpen((open) => !open)}
@@ -106,6 +119,7 @@ export const NavBar= () => {
                                     </button>
                                 </div>
                             )}
+                        </div>
                         </div>
                     ) : (
                         <>
@@ -151,6 +165,20 @@ export const NavBar= () => {
 
                         {user ? (
                             <>
+                                {user.role !== "moderator" && (
+                                    <Link
+                                        href={messagesHref(user.role)}
+                                        onClick={()=> setIsMobile(false)}
+                                        className="text-lg text-background hover:text-background py-2 flex items-center gap-2"
+                                    >
+                                        Messages
+                                        {unreadCount > 0 && (
+                                            <span className="h-5 min-w-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center">
+                                                {unreadCount > 9 ? "9+" : unreadCount}
+                                            </span>
+                                        )}
+                                    </Link>
+                                )}
                                 <Link
                                     href={dashboardHref(user.role)}
                                     onClick={()=> setIsMobile(false)}

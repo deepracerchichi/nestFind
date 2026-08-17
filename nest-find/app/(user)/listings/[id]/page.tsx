@@ -1,11 +1,14 @@
 "use client"
 
 import {BadgeCheck, Bath, BedDouble, BookmarkIcon, Flag, ChevronRight, Droplets, MapPin, Shield, Wifi, Zap} from "lucide-react";
-import {useParams, useSearchParams} from "next/navigation";
+import {useParams, useSearchParams, useRouter} from "next/navigation";
 import {useEffect, useState} from "react";
 import {Listing} from "@/types/listing";
 import {fetchListing, toggleSaveListing, submitReport} from "@/lib/listings";
 import {formatPrice} from "@/lib/currency";
+import {startConversation} from "@/lib/conversations";
+import {messagesHref} from "@/lib/routes";
+import {useAuth} from "@/context/AuthContext";
 import {toast} from "react-hot-toast";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,7 +17,7 @@ const amenityIcons: Record<string, any> = {
     Wifi: Wifi,
     Generator: Zap,
     Water: Droplets,
-    Security: Shield,  
+    Security: Shield,
 }
 
 export default function ListingDetailPage() {
@@ -28,6 +31,10 @@ export default function ListingDetailPage() {
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [reportReason, setReportReason] = useState("");
     const [submittingReport, setSubmittingReport] = useState(false);
+
+    const router = useRouter();
+    const { user } = useAuth();
+    const [startingChat, setStartingChat] = useState(false);
 
 
     useEffect(
@@ -48,6 +55,21 @@ export default function ListingDetailPage() {
 
         }
     };
+
+    const handleContactLandlord = async () => {
+        if (!listing) return;
+        setStartingChat(true);
+        try {
+            const conversation = await startConversation(listing._id, listing.postedBy._id);
+            router.push(`${messagesHref(user?.role ?? "user")}/${conversation._id}`);
+        } catch (e) {
+            console.error("Error starting conversation", e);
+            toast.error("Couldn't start conversation, try again");
+        } finally {
+            setStartingChat(false);
+        }
+    };
+
 
     const handleSubmitReport = async () => {
         if (!listing || !reportReason.trim()) return;
@@ -169,9 +191,20 @@ export default function ListingDetailPage() {
                         </span>
                     </div>
 
-                    <button className="w-full bg-primary text-primary-foreground rounded-full py-3 font-other hover:opacity-90 transition-opacity">
-                        Contact Landlord
-                    </button>
+                                        {user?.id === listing.postedBy._id ? (
+                                            <p className="text-xs text-center text-background/70 font-other py-3">
+                                                This is your listing
+                                            </p>
+                                        ) : (
+                                            <button
+                                                onClick={handleContactLandlord}
+                                                disabled={startingChat}
+                                                className="w-full bg-primary text-primary-foreground rounded-full py-3 font-other hover:opacity-90 disabled:opacity-50 transition-opacity"
+                                            >
+                                                {startingChat ? "Starting chat..." : "Contact Landlord"}
+                                            </button>
+                                        )}
+
 
                                         <p className="text-xs text-center text-muted-foreground font-other">
                         Posted by <span className="text-primary font-medium">{listing.postedBy.username}</span>

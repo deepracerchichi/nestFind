@@ -8,6 +8,20 @@ import {CURRENCIES} from "@/lib/currency";
 import {Search} from "lucide-react";
 import ListingCard from "@/components/ListingCard";
 import {useRouter, useSearchParams} from "next/navigation";
+import {Select} from "@base-ui/react";
+import { Check, ChevronDown } from "lucide-react";
+
+
+
+const PROPERTY_TYPES = [
+    { value: "", label: "All Types"},
+    {value: "apartment", label: "Apartment"},
+    {value: "house", label: "House"},
+    {value: "room", label: "Room"},
+    {value: "studio", label: "Studio"},
+    {value: "duplex", label: "Duplex"},
+]
+
 
 export default function ListingsPage() {
     const router = useRouter();
@@ -110,30 +124,65 @@ export default function ListingsPage() {
                         />
                     </div>
 
-                    <select
-                        value={propertyType}
-                        onChange={(e) => setPropertyType(e.target.value)}
-                        className="glass rounded-full px-4 py-2 text-sm outline-none appearance-none cursor-pointer font-other"
-                    >
-                        <option value="">All Types</option>
-                        <option value="apartment">Apartment</option>
-                        <option value="house">House</option>
-                        <option value="room">Room</option>
-                        <option value="studio">Studio</option>
-                        <option value="duplex">Duplex</option>
-                    </select>
+                    <Select.Root items={PROPERTY_TYPES} value={propertyType} onValueChange={setPropertyType}>
+                        <Select.Trigger className="glass rounded-full px-4 py-2 text-sm outline-none cursor-pointer font-other flex items-center gap-1.5">
+                            <Select.Value />
+                            <Select.Icon>
+                                <ChevronDown size={14} />
+                            </Select.Icon>
+                        </Select.Trigger>
+                        <Select.Portal>
+                            <Select.Positioner sideOffset={8}>
+                                <Select.Popup className="glass-strong rounded-2xl p-1.5 min-w-40 outline-none">
+                                    {PROPERTY_TYPES.map((type) => (
+                                        <Select.Item
+                                            key={type.value}
+                                            value={type.value}
+                                            className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm cursor-pointer outline-none data-highlighted:bg-primary/10 data-highlighted:text-primary"
+                                        >
+                                            <Select.ItemText>{type.label}</Select.ItemText>
+                                            <Select.ItemIndicator>
+                                                <Check size={14} />
+                                            </Select.ItemIndicator>
+                                        </Select.Item>
+                                    ))}
+                                </Select.Popup>
+                            </Select.Positioner>
+                        </Select.Portal>
+                    </Select.Root>
+
 
                     <div className="glass flex items-center gap-1 rounded-full pl-2 pr-4 py-2">
-                        <select
+                        <Select.Root
+                            items={CURRENCIES.map((c) => ({ value: c.code, label: c.code }))}
                             value={currency}
-                            onChange={(e) => setCurrency(e.target.value)}
-                            aria-label="Currency"
-                            className="bg-transparent outline-none text-sm font-medium cursor-pointer"
+                            onValueChange={setCurrency}
                         >
-                            {CURRENCIES.map((c) => (
-                                <option key={c.code} value={c.code}>{c.code}</option>
-                            ))}
-                        </select>
+                            <Select.Trigger className="bg-transparent outline-none text-sm font-medium cursor-pointer flex items-center gap-1">
+                                <Select.Value />
+                                <Select.Icon>
+                                    <ChevronDown size={12} />
+                                </Select.Icon>
+                            </Select.Trigger>
+                            <Select.Portal>
+                                <Select.Positioner sideOffset={8}>
+                                    <Select.Popup className="glass-strong rounded-2xl p-1.5 min-w-[11rem] outline-none">
+                                        {CURRENCIES.map((c) => (
+                                            <Select.Item
+                                                key={c.code}
+                                                value={c.code}
+                                                className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm cursor-pointer outline-none data-[highlighted]:bg-primary/10 data-[highlighted]:text-primary"
+                                            >
+                                                <Select.ItemText>{c.code} — {c.label}</Select.ItemText>
+                                                <Select.ItemIndicator>
+                                                    <Check size={14} />
+                                                </Select.ItemIndicator>
+                                            </Select.Item>
+                                        ))}
+                                    </Select.Popup>
+                                </Select.Positioner>
+                            </Select.Portal>
+                        </Select.Root>
                         <input
                             type="number"
                             placeholder="Max price"
