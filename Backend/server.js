@@ -84,7 +84,7 @@ io.on("connection", (socket) => {
             if (!isParticipant) return;
 
             const message = await Message.create({
-                covnversation: conversationId,
+                conversation: conversationId,
                 sender: socket.userId,
                 text,
             });
