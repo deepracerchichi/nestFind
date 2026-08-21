@@ -1,5 +1,5 @@
 import express from "express";
-import {getUsers, deleteUser, getProfile, saveListing, getSavedListings} from "../controllers/userController.js";
+import {getUsers, deleteUser, getProfile, saveListing, getSavedListings, changePassword, changeUsername, requestEmailChange, confirmEmailChange} from "../controllers/userController.js";
 import {verifyToken, verifyRole} from "../middleware/authMiddleware.js";
 
 
@@ -11,6 +11,10 @@ router.delete("/:id", verifyToken, verifyRole("admin"), deleteUser);
 router.get("/me", verifyToken, getProfile);
 router.post("/save/:listingId", verifyToken, saveListing);
 router.get("/saved", verifyToken, getSavedListings);
+router.patch("/password", verifyToken, changePassword);
+router.patch("/username", verifyToken, changeUsername);
+router.post("/email/request-change", verifyToken, requestEmailChange);
+router.post("/email/confirm-change", confirmEmailChange);
 
 //router.get("/me", verifyToken, updateProfile);
 

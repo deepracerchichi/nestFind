@@ -1,4 +1,4 @@
 Backend/node_modules
-Frontend/node_modules
+nest-find/node_modules
 Backend/.env
-Frontend/.env
+nest-find/.env

@@ -1,5 +1,5 @@
 "use client";
-
+import PasswordRequirements, {isPasswordValid} from "@/components/PasswordRequirements";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -123,6 +123,8 @@ export default function RegisterPage() {
               </button>
             </div>
 
+            <PasswordRequirements password={password} />
+
             <div className="grid grid-cols-2 gap-3 w-full">
               <button
                 type="button"
@@ -156,7 +158,7 @@ export default function RegisterPage() {
 
             <button
               onClick={handleRegister}
-              disabled={loading}
+              disabled={loading || !isPasswordValid(password)}
               className="bg-primary w-full text-primary-foreground mt-3 rounded-full p-2 hover:opacity-90 disabled:opacity-50 transition-opacity"
             >
               {loading ? "Registering..." : "Register"}

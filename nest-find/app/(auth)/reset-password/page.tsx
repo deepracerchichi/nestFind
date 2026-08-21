@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { resetPassword } from "@/lib/auth";
-
+import PasswordRequirements, {isPasswordValid} from "@/components/PasswordRequirements";
 export default function ResetPasswordPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -51,9 +51,12 @@ export default function ResetPasswordPage() {
                         autoComplete="new-password"
                         className="font-medium border-b-2 p-2 w-full focus:outline-none focus:border-primary"
                     />
+
+                    <PasswordRequirements password={newPassword} />
+
                     <button
                         onClick={handleSubmit}
-                        disabled={loading}
+                        disabled={loading || !isPasswordValid(newPassword)}
                         className="bg-primary text-primary-foreground rounded-full p-2 hover:opacity-90 disabled:opacity-50 transition-opacity"
                     >
                         {loading ? "Resetting..." : "Reset password"}

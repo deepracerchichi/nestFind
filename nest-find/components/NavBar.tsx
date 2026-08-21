@@ -1,6 +1,6 @@
 "use client"
 import {useEffect, useRef, useState} from "react";
-import {LayoutDashboard, LogOut, MapPin, MenuIcon, MessageCircle, XIcon} from "lucide-react";
+import {LayoutDashboard, LogOut, MapPin, MenuIcon, MessageCircle, Settings, XIcon} from "lucide-react";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -109,6 +109,14 @@ export const NavBar= () => {
                                         <LayoutDashboard size={16} />
                                         Dashboard
                                     </Link>
+                                    <Link 
+                                        href="/account"
+                                        onClick={()=>setIsProfileOpen(false)}
+                                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-foreground hover:text-background transition-colors"
+                                        >
+                                            <Settings size={16} />
+                                            Account Settings
+                                    </Link>
 
                                     <button
                                         onClick={handleLogout}
@@ -185,6 +193,13 @@ export const NavBar= () => {
                                     className="text-lg text-background hover:text-background py-2"
                                 >
                                     Dashboard
+                                </Link>
+                                <Link
+                                    href="/account"
+                                    onClick={()=> setIsMobile(false)}
+                                    className="text-lg text-background hover:text-background py-2"
+                                >
+                                    Account Settings
                                 </Link>
                                 <button
                                     onClick={() => { setIsMobile(false); void handleLogout(); }}

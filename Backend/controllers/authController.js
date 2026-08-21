@@ -3,10 +3,12 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 import strict from "node:assert/strict";
 import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail } from "../utils/email.js";
+import { PASSWORD_REGEX, PASSWORD_REQUIREMENTS_MESSAGE } from "../utils/validation.js";
 
 // Signs a fresh access/refresh token pair for `user` and sets them as
 // HttpOnly cookies on `res`, so any endpoint that authenticates a user
 // (login, register, ...) ends up in the same logged-in state.
+
 const issueAuthCookies = (user, res) => {
     const accessToken = jwt.sign({
         id: user._id,
@@ -255,6 +257,10 @@ export const resetPassword = async (req, res) => {
     const { token, newPassword } = req.body;
     if (!token || !newPassword) {
         return res.status(400).json({ message: "Token and new password are required" });
+    }
+
+    if (!PASSWORD_REGEX.test(newPassword)) {
+        return res.status(400).json({message: PASSWORD_REQUIREMENTS_MESSAGE})
     }
 
     try {
