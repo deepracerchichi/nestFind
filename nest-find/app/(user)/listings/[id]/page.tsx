@@ -60,7 +60,7 @@ export default function ListingDetailPage() {
         if (!listing) return;
         setStartingChat(true);
         try {
-            const conversation = await startConversation(listing._id, listing.postedBy._id);
+            const conversation = await startConversation(listing._id);
             router.push(`${messagesHref(user?.role ?? "user")}/${conversation._id}`);
         } catch (e) {
             console.error("Error starting conversation", e);

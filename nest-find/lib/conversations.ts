@@ -1,8 +1,8 @@
 import api from "@/lib/api";
 import type { Conversation, Message } from "@/types/conversation";
 
-export const startConversation = async (listingId: string, sellerId: string): Promise<Conversation> => {
-    const res = await api.post<{ conversation: Conversation }>("/api/conversations", { listingId, sellerId });
+export const startConversation = async (listingId: string): Promise<Conversation> => {
+    const res = await api.post<{ conversation: Conversation }>("/api/conversations", { listingId });
     return res.data.conversation;
 };
 

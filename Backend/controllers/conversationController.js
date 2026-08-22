@@ -1,13 +1,21 @@
 import Conversation from "../models/conversation.js";
+import Listing from "../models/listing.js";
 import Message from "../models/message.js";
 
 // POST /api/conversations - start or get existing conversation about a listing
 export const startConversation = async (req, res) => {
     try {
-        const { listingId, sellerId } = req.body;
-        if (!listingId || !sellerId) {
-            return res.status(400).json({message: "listingId and sellerId are required"});
+        const { listingId } = req.body;
+        if (!listingId) {
+            return res.status(400).json({message: "listingId is required"});
         }
+
+        const listing = await Listing.findById(listingId);
+        if (!listing) {
+            return res.status(404).json({message: "Listing not found"});
+        }
+
+        const sellerId = listing.postedBy.toString();
 
         if (sellerId === req.user.id) {
             return res.status(400).json({message: "You can't message yourself"});
@@ -31,6 +39,7 @@ export const startConversation = async (req, res) => {
         res.status(500).json({message: "Server error"});
     }
 }
+
 
 // GET /api/conversations - list current user's conversations, for an inbox
 export const getConversations = async (req, res) => {
