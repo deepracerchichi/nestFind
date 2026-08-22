@@ -1,48 +1,21 @@
 import "dotenv/config";
-import express from "express";
 import http from "http";
-import {Server} from "socket.io";
-import { connectDB } from "./database/db.js";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import authRoutes from "./routes/auth.js";
-import userRoutes from "./routes/users.js";
-import listingRoutes from "./routes/listings.js"
-import uploadRoutes from "./routes/upload.js"
-import reportRoutes from "./routes/reports.js";
+import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
+import { connectDB } from "./database/db.js";
 import Conversation from "./models/conversation.js";
 import Message from "./models/message.js";
-import conversationRoutes from "./routes/conversations.js";
+import app from "./app.js";
 
+const port = process.env.PORT;
 
-
-const port = process.env.PORT
-const app = express();
-
-const server = http.createServer(app); // the object app.listen() used to create silently
+const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
         origin: process.env.FRONTEND_URL,
         credentials: true,
     }
-})
-app.use(express.json());//so that when the frontend sends data to the backend in json format it can understand it.
-
-app.use(cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true
-})); //so backend and frontend can have different ports
-
-app.use(cookieParser()); //for the middleware
-
-app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/listings", listingRoutes);
-app.use("/api/upload", uploadRoutes);
-app.use("/api/reports", reportRoutes);
-app.use("/api/conversations", conversationRoutes);
-
+});
 
 const parseCookies = (cookieHeader) => {
     if (!cookieHeader) return {};
@@ -66,16 +39,15 @@ io.use((socket, next) => {
     } catch (error) {
         next(new Error("Authentication failed"));
     }
-})
+});
 
 io.on("connection", (socket) => {
     console.log("A user connected:", socket.id);
-    socket.join(socket.userId); // their personal room - anything meant for them arrives here
+    socket.join(socket.userId);
 
-    socket.on("sendMessage", async ({conversationId, text}) => {
+    socket.on("sendMessage", async ({ conversationId, text }) => {
         try {
             const conversation = await Conversation.findById(conversationId);
-
             if (!conversation) return;
 
             const isParticipant = conversation.participants
@@ -99,11 +71,8 @@ io.on("connection", (socket) => {
                 sender: socket.userId,
                 text,
                 createdAt: message.createdAt,
-            }
+            };
 
-            // Both participants, not just the recipient - this covers the
-            // sender's own other open tabs too, and gives the frontend one
-            // single code path for "a message arrived" instead of two.
             conversation.participants.forEach((participantId) => {
                 io.to(participantId.toString()).emit("newMessage", payload);
             });
