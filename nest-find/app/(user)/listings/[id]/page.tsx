@@ -1,6 +1,6 @@
 "use client"
 
-import {BadgeCheck, Bath, BedDouble, BookmarkIcon, Flag, ChevronRight, Droplets, MapPin, Shield, Wifi, Zap} from "lucide-react";
+import {BadgeCheck, Bath, BedDouble, BookmarkIcon, Flag, ChevronRight, Droplets, HouseIcon, MapPin, Shield, Wifi, Zap} from "lucide-react";
 import {useParams, useSearchParams, useRouter} from "next/navigation";
 import {useEffect, useState} from "react";
 import {Listing} from "@/types/listing";
@@ -88,7 +88,25 @@ export default function ListingDetailPage() {
     };
 
 
-    if (!listing) return <div>Loading...</div>;
+    if (!listing) {
+        return (
+            <div className="max-w-7xl mx-auto px-6 md:px-14 pt-15 pb-16">
+                <div className="flex flex-col lg:flex-row gap-8 animate-pulse">
+                    <div className="lg:w-2/3">
+                        <div className="aspect-video rounded-2xl bg-muted" />
+                    </div>
+                    <div className="lg:w-1/3 space-y-6">
+                        <div className="h-7 bg-muted rounded w-3/4" />
+                        <div className="h-40 bg-muted rounded-2xl" />
+                        <div className="h-4 bg-muted rounded w-full" />
+                        <div className="h-4 bg-muted rounded w-5/6" />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    const validImages = listing.images.filter(Boolean);
 
     return (
         <div className="max-w-7xl mx-auto px-6 md:px-14 pt-15 pb-16">
@@ -113,18 +131,23 @@ export default function ListingDetailPage() {
             {/* Image Gallery */}
             <div className="lg:w-2/3">
                 <div className="relative aspect-video rounded-2xl overflow-hidden">
-                    
-                    <Image
-                        src={listing.images[activeImage] || "/placeholder.jpg"}
-                        alt={listing.title}
-                        fill
-                        className=""
-                    />
+                    {validImages[activeImage] ? (
+                        <Image
+                            src={validImages[activeImage]}
+                            alt={listing.title}
+                            fill
+                            className=""
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-muted">
+                            <HouseIcon className="h-16 w-16 text-muted-foreground" />
+                        </div>
+                    )}
                 </div>
 
-                {listing.images.length > 1 && (
+                {validImages.length > 1 && (
                     <div className="flex gap-3 mt-4">
-                        {listing.images.map((img, idx) => (
+                        {validImages.map((img, idx) => (
                             <button key={idx} onClick={() => setActiveImage(idx)}>
                                 <div className={`relative h-16 w-24 rounded-md overflow-hidden border-2
                                 ${activeImage === idx ? "border-primary" : "border-transparent"}

@@ -1,13 +1,13 @@
 import {Listing} from "@/types/listing";
 import Link from "next/link";
 import Image from "next/image";
-import {MapPin, BedDouble, Bath, BadgeCheck} from "lucide-react"
+import {MapPin, BedDouble, Bath, BadgeCheck, HouseIcon} from "lucide-react"
 import {usePathname, useSearchParams} from "next/navigation";
 import {formatPrice} from "@/lib/currency";
 
 
 export default function ListingCard({listing}: {listing: Listing}) {
-    const firstImage = listing.images[0] || "/placeholder.jpg";
+    const firstImage = listing.images[0];
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
@@ -20,12 +20,18 @@ export default function ListingCard({listing}: {listing: Listing}) {
             <div className='group glass rounded-2xl overflow-hidden animate-fade-in md:row-span-1'>
 
                 <div className='relative overflow-hidden aspect-video'>
-                    <Image
-                        src={firstImage}
-                        alt={listing.title}
-                        fill
-                        className='object-cover transition-transform duration-700 group-hover:scale-110'
-                    />
+                    {firstImage ? (
+                        <Image
+                            src={firstImage}
+                            alt={listing.title}
+                            fill
+                            className='object-cover transition-transform duration-700 group-hover:scale-110'
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-muted">
+                            <HouseIcon className="h-10 w-10 text-muted-foreground" />
+                        </div>
+                    )}
 
                     {listing.verificationStatus === "verified" && (
                         <span className="absolute top-3 left-3 glass-strong text-xs font-other px-3 py-1 rounded-full flex items-center gap-1 text-primary">

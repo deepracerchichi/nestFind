@@ -19,9 +19,11 @@ export default function PasswordRequirements({password} : {password: string}) {
             {REQUIREMENTS.map((req) => {
                 const met = req.test(password);
                 return (
-                    <li key={req.label} className={met ? "text-green-600" : "text-muted-foreground"}>
-                        {met ? <TicketCheck /> : <RadioIcon />}
+                    <li key={req.label} className={`flex items-center gap-1.5 ${met ? "text-green-600" : "text-muted-foreground"}`}>
+                        {met ? <TicketCheck size={14} /> : <RadioIcon size={14} />}
+                        {req.label}
                     </li>
+
                 )
             })}
 
