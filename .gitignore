@@ -2,3 +2,5 @@ Backend/node_modules
 nest-find/node_modules
 Backend/.env
 nest-find/.env
+CLAUDE.md
+AGENTS.md
