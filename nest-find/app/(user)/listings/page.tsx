@@ -124,7 +124,7 @@ export default function ListingsPage() {
                         />
                     </div>
 
-                    <Select.Root items={PROPERTY_TYPES} value={propertyType} onValueChange={setPropertyType}>
+                    <Select.Root items={PROPERTY_TYPES} value={propertyType} onValueChange={(value) => setPropertyType(value ?? "")}>
                         <Select.Trigger className="glass rounded-full px-4 py-2 text-sm outline-none cursor-pointer font-other flex items-center gap-1.5">
                             <Select.Value />
                             <Select.Icon>
@@ -156,7 +156,7 @@ export default function ListingsPage() {
                         <Select.Root
                             items={CURRENCIES.map((c) => ({ value: c.code, label: c.code }))}
                             value={currency}
-                            onValueChange={setCurrency}
+                            onValueChange={(value) => setCurrency(value ?? "")}
                         >
                             <Select.Trigger className="bg-transparent outline-none text-sm font-medium cursor-pointer flex items-center gap-1">
                                 <Select.Value />
