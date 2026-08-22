@@ -2,7 +2,7 @@
 export const uploadImage = async (req, res) => {
     try {
         //multer + cloudinary puts the results in req.files
-        const urls = req.files.map((file) => file.path);
+        const urls = req.files.map((file) => file.secure_url);
         res.status(200).json({urls});
 
     } catch (e) {
