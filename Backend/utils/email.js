@@ -22,7 +22,7 @@ const FROM = () => `"nestFind" <${process.env.GMAIL_USER}>`;
 
 
 const FRONTEND_URL = process.env.FRONTEND_URL;
-const LOGO_URL = `${FRONTEND_URL}/navLogo.png`;
+const LOGO_URL = "https://res.cloudinary.com/dnu9wti6r/image/upload/v1787349518/navLogo.png";
 const PRIMARY = "#B714F7";
 
 const buildEmailHtml = ({ heading, body, buttonText, buttonUrl, footerNote }) => `
