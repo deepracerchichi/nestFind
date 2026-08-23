@@ -1,14 +1,18 @@
 "use client"
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {Listing} from "@/types/listing";
 import {fetchListings} from "@/lib/listings";
 import ListingCard from "@/components/ListingCard";
 import Link from "next/link";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export default function FeaturedListings() {
     const [listings, setListings] = useState<Listing[]>([]);
     const [loading, setLoading] = useState(true);
 
+    gsap.registerPlugin(ScrollTrigger)
     useEffect(() => {
         fetchListings({page: 1})
             .then(data => setListings(data.listings.slice(0, 6)))
@@ -16,14 +20,28 @@ export default function FeaturedListings() {
             .finally(() => setLoading(false));
     }, []);
 
+    const containerRef = useRef<HTMLElement>(null)
+    useGSAP(()=>{
+        gsap.from(".fade-in-text", {
+            opacity: 0,
+            y: 20,
+            duration: 0.8,
+            stagger: 0.15,
+            scrollTrigger: {
+                trigger: containerRef.current,
+                start: "top 80%",
+            }
+        })
+    }, {scope:containerRef})
+
     return (
-        <section className="py-10 overflow-hidden bg-foreground px-14 space-y-7">
+        <section ref={containerRef} className="py-10 overflow-hidden bg-foreground px-14 space-y-7">
             <div className="flex items-end justify-between">
                 <div className="space-y-5">
-                    <h2 className="uppercase font-other text-background text-xl md:text-2xl">
+                    <h2 className="fade-in-text uppercase font-other text-background text-xl md:text-2xl">
                         Latest Properties
                     </h2>
-                    <h1 className="text-background text-4xl md:text-5xl font-bold leading-tight">
+                    <h1 className="fade-in-text text-background text-4xl md:text-5xl font-bold leading-tight">
                         Featured <span className="text-primary glow-text">Listings</span>
                     </h1>
                 </div>
@@ -31,7 +49,7 @@ export default function FeaturedListings() {
                 
             </div>
 
-            <div className="container mx-auto">
+            <div className="fade-in-text container mx-auto">
                 {loading ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
                         {[...Array(3)].map((_, i) => (

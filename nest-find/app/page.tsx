@@ -7,8 +7,14 @@ import FeaturedListings from "@/components/FeaturedListings";
 import AboutUs from "@/components/AboutUs";
 import Extra from "@/components/Extra";
 import {useRouter} from "next/navigation";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import Footer from "@/components/Footer";
+import gsap from "gsap";
+import {useGSAP} from "@gsap/react";
+import { TypingAnimation } from "@/components/ui/typing-animation";
+
+
+
 
 export default function Home() {
     const router = useRouter();
@@ -26,29 +32,43 @@ export default function Home() {
         router.push(`/listings?search=${encodeURIComponent(trimmedSearch)}`);
     }
 
+    const containerRef = useRef<HTMLElement>(null);
+
+    useGSAP(()=>{
+
+        gsap.from(".fade-in-text", {
+            opacity: 0,
+            y:20,
+            stagger: 0.15
+        })
+    }
+
+    , {scope: containerRef})
   return (
       <div className="min-h-screen overflow-x-hidden">
           {/*<Toaster />*/}
           <NavBar />
           <main>
               
-              <header className="home-hero-pattern relative min-h-screen flex items-start pt-28 overflow-hidden">
+              <header ref={containerRef} className="home-hero-pattern relative min-h-screen flex items-start pt-28 overflow-hidden">
 
                   <div className="container mx-auto px-6 pb-20 relative text-center">
                       <div className="relative z-10 items-center space-y-5">
 
                           {/* Headline */}
-                          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
-                              Stop Scrolling. Start <span className="text-primary glow-text">Moving.</span>
-                          </h1>
+                          <h1 className="fade-in-text text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
+                                Stop Scrolling. Start{" "}
+                                <TypingAnimation className="text-primary glow-text" words={["Moving.", "Listing."]} loop/>
+                            </h1>   
 
-                          <p className="text-lg w-10/12 mx-auto">
+
+                          <p className="fade-in-text text-lg w-10/12 mx-auto">
                               Find verified apartments, houses, and studios across your vicinity all in one place.
                           </p>
 
                           <form
                               onSubmit={handleSearch}
-                              className="glass rounded-full px-7 py-3 max-w-xl mx-auto flex items-center gap-3 justify-end"
+                              className="fade-in-text glass rounded-full px-7 py-3 max-w-xl mx-auto flex items-center gap-3 justify-end"
                           >
                               <input
                                   className="w-full outline-none "

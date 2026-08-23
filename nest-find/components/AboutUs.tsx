@@ -1,6 +1,11 @@
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {Bookmark, Search, Share2} from "lucide-react";
-
+import gsap from "gsap";
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
 const AboutUs = () => {
+
+    gsap.registerPlugin(ScrollTrigger)
     const steps = [
         {
             icon: Search,
@@ -19,19 +24,36 @@ const AboutUs = () => {
         },
     ]
 
+    const containerRef = useRef<HTMLElement>(null)
+
+    useGSAP(()=>{
+
+        gsap.from(".fade-in-text", {
+            opacity: 0,
+            duration: 0.8,
+            y: 20,
+            stagger: 0.15,
+            scrollTrigger: {
+                trigger: containerRef.current,
+                start: "top 80%",
+            }
+        })
+    },{scope:containerRef})
+
+
     return (
-        <section className="bg-background py-20 px-14">
+        <section ref={containerRef} className="bg-background py-20 px-14">
             <div className="container mx-auto text-center">
-                <p className="uppercase font-other text-muted-foreground text-md tracking-widest">
+                <p className=" fade-in-text uppercase font-other text-muted-foreground text-md tracking-widest">
                     Simple Process
                 </p>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mt-2">
+                <h1 className="fade-in-text text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mt-2">
                     How NestFind Works
                 </h1>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
                     {steps.map((step, idx) => (
-                        <div key={idx} className="flex flex-col items-center">
+                        <div key={idx} className="fade-in-text flex flex-col items-center">
                             <div className="rounded-2xl h-20 w-20 bg-foreground flex items-center justify-center mb-5">
                                 <step.icon size={36} className="text-primary" />
                             </div>
