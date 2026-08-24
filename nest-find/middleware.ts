@@ -30,7 +30,8 @@ export async function middleware(request: NextRequest) {
       }
 
       return NextResponse.next();
-    } catch {
+    } catch(e) {
+      console.error("middleware: jwtVerify failed:", e);
       // Invalid signature or expired - fall through and try a silent
       // refresh below instead of treating this as "logged out" outright.
     }
@@ -43,6 +44,7 @@ export async function middleware(request: NextRequest) {
   // though the 7-day refreshToken session is still perfectly valid.
   const refreshToken = request.cookies.get("refreshToken")?.value;
   if (!refreshToken) {
+    console.error("middleware: no refreshToken cookie present");
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -51,6 +53,7 @@ export async function middleware(request: NextRequest) {
   });
 
   if (!refreshRes.ok) {
+    console.error("middleware: refresh fallback failed:", refreshRes.status, await refreshRes.text());
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
