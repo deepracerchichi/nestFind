@@ -44,16 +44,16 @@ const Extra = () => {
                 </div>
             </div>
 
-            <div className='flex-col'>
+            <div className='fade-in-text flex-col'>
                 <button
-                    className='fade-in-text bg-background rounded-full px-6 py-3 text-foreground text-base md:text-lg hover:bg-foreground hover:text-background transition-all duration-300'
+                    className=" bg-background rounded-full px-6 py-3 text-foreground text-base md:text-lg hover:bg-foreground hover:text-background transition-all duration-300"
                     onClick={handleRegister}>
                     <span className="flex items-center justify-center gap-2">
                         Get Started as an Owner
                         <PlusIcon />
                     </span>
                 </button>
-                <p className="fade-in-text text-background text-center font-other text-md mt-2">
+                <p className=" text-background text-center font-other text-md mt-2">
                     No credit card required. 
                 </p>
             </div>
