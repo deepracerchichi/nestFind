@@ -17,7 +17,10 @@ export default function FeaturedListings() {
         fetchListings({page: 1})
             .then(data => setListings(data.listings.slice(0, 6)))
             .catch(() => {})
-            .finally(() => setLoading(false));
+            .finally(() => {
+                setLoading(false);
+                requestAnimationFrame(()=> ScrollTrigger.refresh())
+            });
     }, []);
 
     const containerRef = useRef<HTMLElement>(null)
