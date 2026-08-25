@@ -10,9 +10,10 @@ declare module "axios" {
 }
 
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
-    withCredentials:true // lets the refreshToken cookie flow automatically
+    baseURL: "", // relative — routes through the Next.js rewrite proxy in next.config.ts, so Set-Cookie lands on this domain instead of the backend's
+    withCredentials: true
 })
+
 
 
 //Attach the access token to every request if it exists
@@ -41,10 +42,8 @@ const api = axios.create({
                 original._retry = true;
 
                 try {
-                    await axios.get(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/refreshToken`,
-                    { withCredentials: true }
-                    );
+                    await axios.get("/api/auth/refreshToken", { withCredentials: true });
+
                     return api(original);
                 } catch {
                     if (!original.skipAuthRedirect) {
