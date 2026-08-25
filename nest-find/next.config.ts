@@ -9,14 +9,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async rewrites() {
+ async rewrites() {
     return [
       {
         source: "/api/:path*",
-        destination: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/:path*`,
+        destination: "https://nestfind-production-312f.up.railway.app/api/:path*",
       },
     ];
-  },
+},
+
 };
 
 export default nextConfig;
